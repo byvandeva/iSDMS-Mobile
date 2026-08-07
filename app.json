@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Suzuki Dealer Portal",
+    "slug": "Suzuki-Dealer-Portal",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "default",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "icon": "./assets/s_logo.png",
+    "web": {
+      "favicon": "./assets/s_logo.png",
+      "bundler": "metro"
+    }
+  }
+}
