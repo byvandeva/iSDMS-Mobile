@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles } from '../../../theme/theme';
+import { globalStyles } from '../../../../config/theme';
 
 export default function EditTicketModal({ visible, onClose, editForm, setEditForm, onSave }) {
   return (

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Modal, TouchableOpacity, Animated } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles } from '../theme/theme';
+import { globalStyles } from '../config/theme';
 
 export default function SuccessCheckInModal({ data, onClose }) {
   const scaleAnim = useRef(new Animated.Value(0)).current;

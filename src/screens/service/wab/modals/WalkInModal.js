@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, Keyboard, Alert, ActivityIndicator, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles } from '../../../theme/theme';
+import { globalStyles } from '../../../../config/theme';
 
 const OCR_SPACE_API_KEY = 'K89836873688957';
 

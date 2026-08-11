@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles, COLORS } from '../../../theme/theme';
+import { globalStyles, COLORS } from '../../../config/theme';
 import { getPurposeString, getStatusString } from '../../../utils/helpers';
+import { interleavePriorityQueue } from '../../../utils/queuePriority';
 
 export default function GuestListScreen({
   tickets,
@@ -16,7 +17,7 @@ export default function GuestListScreen({
   onOpenCheckOutModal,
   onViewWabHistory,
 }) {
-  const filteredTickets = tickets
+  const baseFiltered = tickets
     .filter(t => t.status !== 'CheckedOut')
     .filter(t => {
       const q = searchQuery.toLowerCase().trim();
@@ -30,8 +31,10 @@ export default function GuestListScreen({
       const matchesPurpose = filterPurpose === 'All' || purposeStr.toLowerCase() === filterPurpose.toLowerCase();
 
       return matchesSearch && matchesPurpose;
-    })
-    .sort((a, b) => new Date(b.checkInTime || b.createdAt || 0) - new Date(a.checkInTime || a.createdAt || 0));
+    });
+
+  // Under-the-hood 2:1 queue sorting
+  const interleavedTickets = interleavePriorityQueue(baseFiltered);
 
   return (
     <View style={globalStyles.card}>
@@ -66,17 +69,17 @@ export default function GuestListScreen({
         ))}
       </ScrollView>
 
-      {filteredTickets.length === 0 ? (
+      {interleavedTickets.length === 0 ? (
         <Text style={{ color: '#94a3b8', textAlign: 'center', padding: 20 }}>Tidak ada data tamu yang cocok.</Text>
       ) : (
-        filteredTickets.map(t => {
+        interleavedTickets.map((t, idx) => {
           const isService = getPurposeString(t.arrivalPurpose) === 'Service';
           const isWabDone = t.status === 'Inspected' || t.status === 'WabDone' || t.wabSubmitted;
           const isWabInProgress = t.status === 'WabInProgress' || t.status === 'InProgress' || t.status === 'In Progress';
 
           return (
-            <View key={t.ticketId} style={globalStyles.itemBox}>
-              {/* TOP HEADER ROW WITH QUEUE BADGE, STATUS BADGE & PLATE */}
+            <View key={t.ticketId || idx} style={globalStyles.itemBox}>
+              {/* TOP ROW WITH QUEUE BADGE, STATUS BADGE & PLATE */}
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={globalStyles.queueBadge}>{t.queueNumber || 'Non-Service'}</Text>
@@ -103,7 +106,7 @@ export default function GuestListScreen({
                 <Text style={globalStyles.plateText}>{t.licensePlate}</Text>
               </View>
 
-              <Text style={globalStyles.customerText}>{(!t.customerName || t.customerName === 'Diisi oleh SA di WAB') ? '-' : t.customerName}</Text>
+              <Text style={globalStyles.customerText}>{t.customerName || '-'}</Text>
               <Text style={globalStyles.subDetailText}>Tujuan: {getPurposeString(t.arrivalPurpose)} &bull; Model: {t.vehicleModel}</Text>
 
               {/* ACTION BUTTONS SIDE-BY-SIDE IN ONE ROW */}

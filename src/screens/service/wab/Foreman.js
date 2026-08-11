@@ -4,7 +4,7 @@ import {
   Modal, StyleSheet, KeyboardAvoidingView, Platform
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles, COLORS } from '../../../theme/theme';
+import { globalStyles, COLORS } from '../../../config/theme';
 import { getPurposeString } from '../../../utils/helpers';
 
 const MOCK_TECHNICIANS = [
@@ -157,7 +157,7 @@ function RecommendationModal({ visible, existingRec, onSave, onClose }) {
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={ms.centeredOverlay}>
         <View style={ms.centeredCard}>
-          <Text style={ms.cardTitle}>{existingRec ? '✏ Edit Rekomendasi' : '+ Beri Rekomendasi'}</Text>
+          <Text style={ms.cardTitle}>{existingRec ? '✏ Edit Rekomendasi' : '+ Rekomendasi'}</Text>
 
           <Text style={globalStyles.label}>Deskripsi:</Text>
           <TextInput

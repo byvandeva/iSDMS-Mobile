@@ -7,13 +7,13 @@ export default function BottomNav({ userRole, activeTab, setActiveTab }) {
     ? [
       { id: 'bookings', label: 'List Booking', icon: 'list' },
       { id: 'daftar-tamu', label: 'Daftar Tamu', icon: 'users' },
-      { id: 'history', label: 'Riwayat', icon: 'clock' },
+      { id: 'history', label: 'History', icon: 'clock' },
       { id: 'account', label: 'Akun', icon: 'user' },
     ]
     : userRole === 'Foreman'
       ? [
         { id: 'foreman', label: 'Workshop', icon: 'tool' },
-        { id: 'history', label: 'Hist. WAB', icon: 'clock' },
+        { id: 'history', label: 'History', icon: 'clock' },
         { id: 'account', label: 'Akun', icon: 'user' },
       ]
       : [

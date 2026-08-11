@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { COLORS } from '../../../theme/theme';
+import { COLORS } from '../../../../config/theme';
 import Damage360Modal from './Damage360Modal';
 
 const { width: SCREEN_W } = Dimensions.get('window');

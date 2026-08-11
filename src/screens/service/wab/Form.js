@@ -4,9 +4,9 @@ import {
   PanResponder, ActionSheetIOS, Platform, Alert, ScrollView, Keyboard
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles, COLORS } from '../../../theme/theme';
-import Inspection360Modal from '../modals/Inspection360Modal';
-import Damage360Modal from '../modals/Damage360Modal';
+import { globalStyles, COLORS } from '../../../config/theme';
+import Inspection360Modal from './modals/Inspection360Modal';
+import Damage360Modal from './modals/Damage360Modal';
 
 export default function WabFormScreen({
   selectedTicket,

@@ -1,31 +1,53 @@
 import { StyleSheet } from 'react-native';
 
+export const theme = {
+  color: {
+    primary: '#0054a6',
+    primaryDark: '#002b5c',
+    dark: '#0f172a',
+    bg: '#f8fafc',
+    surface: '#ffffff',
+    surfaceAlt: '#f1f5f9',
+    border: '#cbd5e1',
+    borderLight: '#e2e8f0',
+    textPrimary: '#0f172a',
+    textSecondary: '#334155',
+    textMuted: '#64748b',
+    overlay: 'rgba(0,0,0,0.5)',
+    status: {
+      checkedIn: '#0284c7',
+      inProgress: '#0054a6',
+      completed: '#047857',
+      completedBg: '#ecfdf5',
+      danger: '#dc2626',
+      success: '#16a34a',
+    },
+  },
+  radius: { sm: 4, md: 6, lg: 12, xl: 16 },
+  spacing: { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 },
+  font: { sizeSm: 13, sizeXs: 12, sizeMd: 14, sizeLg: 16 },
+};
+
 export const COLORS = {
-  primary: '#0f172a',        
+  primary: '#0f172a',
   primaryHover: '#1e293b',
   accentBlue: '#0054a6',
   accentLightBlue: '#0284c7',
-  
-  background: '#f8fafc',    
+  background: '#f8fafc',
   cardBg: '#ffffff',
-  
   textPrimary: '#0f172a',
   textSecondary: '#64748b',
   textMuted: '#94a3b8',
   textDarkLabel: '#334155',
-  
   border: '#cbd5e1',
   borderLight: '#e2e8f0',
-  
   success: '#16a34a',
   successDark: '#15803d',
   successBg: '#f0fdf4',
   successBorder: '#bbf7d0',
-  
   danger: '#be123c',
   dangerBg: '#ffe4e6',
   dangerBorder: '#fecdd3',
-  
   warning: '#f59e0b',
 };
 

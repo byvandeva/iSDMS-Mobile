@@ -63,14 +63,23 @@ export async function checkInVehicle(data) {
     return await res.json();
   } catch {
     const isService = (data.arrivalPurpose || 'Service') === 'Service';
+    const isBooking = Boolean(data.sdmsBookingId);
+    let qNum = null;
+    if (isService) {
+      if (isBooking) {
+        qNum = data.sdmsBookingId.startsWith('B-') ? data.sdmsBookingId : `B-${data.sdmsBookingId}`;
+      } else {
+        qNum = `W-${Math.floor(100 + Math.random() * 900)}`;
+      }
+    }
     return {
       ticketId: `t-${Date.now()}`,
       ticketNo: `TICK-${Date.now().toString().slice(-6)}`,
-      queueNumber: isService ? `W-${Math.floor(100 + Math.random() * 900)}` : null,
+      queueNumber: qNum,
       arrivalPurpose: data.arrivalPurpose || 'Service',
       sdmsBookingId: data.sdmsBookingId || null,
       licensePlate: (data.licensePlate || 'B 1234 ABC').toUpperCase(),
-      customerName: 'Diisi oleh SA di WAB',
+      customerName: data.customerName || '-',
       customerPhone: '-',
       vehicleModel: data.vehicleModel || 'Suzuki XL7',
       serviceType: data.serviceType || 'Periodic Service',

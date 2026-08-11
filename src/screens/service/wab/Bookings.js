@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { globalStyles } from '../../../theme/theme';
+import { globalStyles } from '../../../config/theme';
 
 export default function BookingListScreen({
   bookings,
@@ -22,7 +22,7 @@ export default function BookingListScreen({
   return (
     <View style={globalStyles.card}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <Text style={globalStyles.cardTitle}>List Booking</Text>
+        <Text style={globalStyles.cardTitle}>List Booking SDMS</Text>
         <TouchableOpacity style={[globalStyles.actionBtn, { marginTop: 0, paddingHorizontal: 12 }]} onPress={onOpenWalkInModal}>
           <Text style={globalStyles.actionBtnText}>+ Walk-In</Text>
         </TouchableOpacity>
@@ -41,10 +41,11 @@ export default function BookingListScreen({
       ) : (
         filteredBookings.map(b => (
           <View key={b.sdmsBookingId} style={globalStyles.itemBox}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
               <Text style={globalStyles.queueBadge}>{b.sdmsBookingId}</Text>
               <Text style={globalStyles.plateText}>{b.licensePlate}</Text>
             </View>
+
             <Text style={globalStyles.customerText}>{b.customerName}</Text>
             <Text style={globalStyles.subDetailText}>{b.vehicleModel} &bull; Jam: {b.bookingTime} &bull; {b.categoryPassComm}</Text>
 

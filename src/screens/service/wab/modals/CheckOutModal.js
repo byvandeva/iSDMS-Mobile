@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity } from 'react-native';
-import { globalStyles } from '../../../theme/theme';
+import { globalStyles } from '../../../../config/theme';
 
 export default function CheckOutModal({ visible, checkingOutTicket, onClose, onConfirm }) {
   return (

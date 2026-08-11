@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { globalStyles, COLORS } from '../../../theme/theme';
+import { COLORS } from '../../config/theme';
 
 export default function AccountScreen({ userRole, onLogout }) {
   return (
-    <View style={globalStyles.card}>
-      <Text style={globalStyles.cardTitle}>Profil Pengguna (Account)</Text>
+    <View style={{ backgroundColor: COLORS.cardBg, padding: 16, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border }}>
+      <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 12 }}>Profil Pengguna (Account)</Text>
 
       <View style={{ alignItems: 'center', marginVertical: 16, padding: 16, backgroundColor: '#f8fafc', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0' }}>
         <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
@@ -22,10 +22,10 @@ export default function AccountScreen({ userRole, onLogout }) {
       </View>
 
       <TouchableOpacity
-        style={[globalStyles.button, { backgroundColor: '#be123c', marginTop: 10 }]}
+        style={{ backgroundColor: '#be123c', padding: 14, borderRadius: 6, alignItems: 'center', marginTop: 10 }}
         onPress={onLogout}
       >
-        <Text style={globalStyles.buttonText}>Logout</Text>
+        <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 14 }}>Logout</Text>
       </TouchableOpacity>
     </View>
   );

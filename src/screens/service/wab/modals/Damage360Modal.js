@@ -3,7 +3,7 @@ import { View, Text, Modal, TextInput, TouchableOpacity, Image, Alert, Keyboard,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Feather } from '@expo/vector-icons';
-import { globalStyles } from '../../../theme/theme';
+import { globalStyles } from '../../../../config/theme';
 
 export default function Damage360Modal({
   visible,

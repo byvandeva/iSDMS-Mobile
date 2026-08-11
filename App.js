@@ -5,7 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 // Services & Helpers
 import { API_BASE, HOST_IP } from './src/services/api.js';
 import { getPurposeString } from './src/utils/helpers.js';
-import { globalStyles } from './src/theme/theme.js';
+import { globalStyles, COLORS } from './src/config/theme.js';
 
 // Layout & Reusable UI Components
 import SplashScreen from './src/components/SplashScreen.js';
@@ -15,20 +15,22 @@ import SignatureModal from './src/components/SignatureModal.js';
 import SuccessCheckInModal from './src/components/SuccessCheckInModal.js';
 
 // Screens
-import LoginScreen from './src/modules/auth/screens/LoginScreen.js';
-import AccountScreen from './src/modules/auth/screens/AccountScreen.js';
-import BookingListScreen from './src/modules/wab/screens/BookingListScreen.js';
-import GuestListScreen from './src/modules/wab/screens/GuestListScreen.js';
-import WabFormScreen from './src/modules/wab/screens/WabFormScreen.js';
-import HistoryScreen from './src/modules/wab/screens/HistoryScreen.js';
-import ForemanScreen from './src/modules/wab/screens/ForemanScreen.js';
+import LoginScreen from './src/screens/auth/Login.js';
+import AccountScreen from './src/screens/auth/Account.js';
+import BookingListScreen from './src/screens/service/wab/Bookings.js';
+import GuestListScreen from './src/screens/service/wab/Guests.js';
+import WabFormScreen from './src/screens/service/wab/Form.js';
+import HistoryScreen from './src/screens/service/wab/History.js';
+import ForemanScreen from './src/screens/service/wab/Foreman.js';
+import DrhDashboardScreen from './src/screens/service/drh/Index.js';
+import SparepartScreen from './src/screens/sparepart/Index.js';
 
 // Modals
-import WalkInModal from './src/modules/wab/modals/WalkInModal.js';
-import EditTicketModal from './src/modules/wab/modals/EditTicketModal.js';
-import CheckOutModal from './src/modules/wab/modals/CheckOutModal.js';
-import PendingCheckInModal from './src/modules/wab/modals/PendingCheckInModal.js';
-import Damage360Modal from './src/modules/wab/modals/Damage360Modal.js';
+import WalkInModal from './src/screens/service/wab/modals/WalkInModal.js';
+import EditTicketModal from './src/screens/service/wab/modals/EditTicketModal.js';
+import CheckOutModal from './src/screens/service/wab/modals/CheckOutModal.js';
+import PendingCheckInModal from './src/screens/service/wab/modals/PendingCheckInModal.js';
+import Damage360Modal from './src/screens/service/wab/modals/Damage360Modal.js';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -127,7 +129,14 @@ export default function App() {
       const res = await fetch(`${API_BASE}/tickets`);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data)) setTickets(data);
+        if (Array.isArray(data)) {
+          setTickets(prev => {
+            if (data.length === 0) return prev;
+            const backendIds = new Set(data.map(d => d.ticketId));
+            const localOnly = prev.filter(p => p.ticketId && String(p.ticketId).startsWith('t-') && !backendIds.has(p.ticketId));
+            return [...localOnly, ...data];
+          });
+        }
       }
     } catch (e) { }
   };
@@ -325,7 +334,7 @@ export default function App() {
 
   const handleStartWab = async (t) => {
     setSelectedTicket(t);
-    setSaCustomerName(t.customerName === 'Diisi oleh SA di WAB' ? '' : (t.customerName || ''));
+    setSaCustomerName((!t.customerName || t.customerName === '-') ? '' : t.customerName);
     setSaCustomerPhone(t.customerPhone || '');
     setWabStep(1);
     setActiveTab('wab-form');
@@ -623,8 +632,10 @@ export default function App() {
 
         {activeTab === 'history' && (
           <HistoryScreen
+            userRole={userRole}
             wabHistory={wabHistory}
             historyTickets={historyTickets}
+            allTickets={tickets}
             initialTicketId={viewWabHistoryTicketId}
             onClearInitialTicket={() => setViewWabHistoryTicketId(null)}
           />

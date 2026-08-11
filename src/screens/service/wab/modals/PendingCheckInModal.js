@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity } from 'react-native';
-import { globalStyles } from '../../../theme/theme';
-import { getPurposeString } from '../../../utils/helpers';
+import { globalStyles } from '../../../../config/theme';
+import { getPurposeString } from '../../../../utils/helpers';
 
 export default function PendingCheckInModal({ pendingCheckIn, onClose, onConfirm }) {
   if (!pendingCheckIn) return null;
