@@ -21,7 +21,6 @@ const MOCK_FOREMEN = [
   { id: 'f3', name: 'Foreman C' },
 ];
 
-// Utilities
 function pad(n) { return String(n).padStart(2, '0'); }
 
 function formatDateTime(iso) {
@@ -53,7 +52,6 @@ function addMinutesToNow(minutes) {
   return d.toISOString();
 }
 
-// Modal: Assign Technician
 function AssignTechnicianModal({ visible, ticket, onAssign, onClose }) {
   const [selectedTech, setSelectedTech] = useState(null);
   const [stallName, setStallName] = useState('');
@@ -128,7 +126,6 @@ function AssignTechnicianModal({ visible, ticket, onAssign, onClose }) {
   );
 }
 
-// Modal: Recommendation (Add / Edit)
 const DATE_CHIPS = [
   { label: 'Hari ini', offset: 0 },
   { label: '+1 Hari', offset: 1 },
@@ -193,7 +190,6 @@ function RecommendationModal({ visible, existingRec, onSave, onClose }) {
   );
 }
 
-// Modal: Confirm Delete Recommendation
 function ConfirmDeleteModal({ visible, itemLabel, onConfirm, onClose }) {
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
@@ -220,7 +216,6 @@ function ConfirmDeleteModal({ visible, itemLabel, onConfirm, onClose }) {
   );
 }
 
-// Modal: Tracking Entry + Estimasi Selesai
 const TIME_CHIPS = [
   { label: '+30m', minutes: 30 },
   { label: '+1j', minutes: 60 },
@@ -284,7 +279,6 @@ function TrackingModal({ visible, onSave, onClose }) {
   );
 }
 
-// Modal: Delegate — Ganti Teknisi / Pindah ke Foreman lain
 function DelegateModal({ visible, ticket, job, currentForeman, onChangeTechnician, onDelegateForeman, onClose }) {
   const [subTab, setSubTab] = useState('tech');
   const [selectedTech, setSelectedTech] = useState(null);
@@ -346,7 +340,6 @@ function DelegateModal({ visible, ticket, job, currentForeman, onChangeTechnicia
             </TouchableOpacity>
           </View>
 
-          {/* Sub-tab row */}
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
             <TouchableOpacity style={[ms.subTabBtn, subTab === 'tech' && ms.subTabActive]} onPress={() => setSubTab('tech')}>
               <Feather name="user" size={13} color={subTab === 'tech' ? '#fff' : '#64748b'} />
@@ -430,7 +423,6 @@ function DelegateModal({ visible, ticket, job, currentForeman, onChangeTechnicia
   );
 }
 
-// Sub-component: Metric Card
 function MetricCard({ label, value, color, icon }) {
   return (
     <View style={[fs.metricCard, { borderTopColor: color, borderTopWidth: 3 }]}>
@@ -441,7 +433,6 @@ function MetricCard({ label, value, color, icon }) {
   );
 }
 
-// Sub-component: Job Card (for both tabs)
 function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRec, onAddTracking, onDelegate, onFinishJob }) {
   const [recExpanded, setRecExpanded] = useState(false);
   const [trackExpanded, setTrackExpanded] = useState(false);
@@ -449,7 +440,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
 
   return (
     <View style={fs.jobCard}>
-      {/* Top row: queue + status */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
         <Text style={globalStyles.queueBadge}>{ticket.queueNumber || 'Non-Q'}</Text>
         {isUndistributed
@@ -460,14 +450,12 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         }
       </View>
 
-      {/* Vehicle info */}
       <Text style={globalStyles.plateText}>{ticket.licensePlate}</Text>
       <Text style={globalStyles.customerText}>{ticket.wabCustomerName || ticket.customerName || '-'}</Text>
       <Text style={globalStyles.subDetailText}>
         {ticket.vehicleModel} · {ticket.wabServiceType || getPurposeString(ticket.arrivalPurpose)}
       </Text>
 
-      {/* Delegated from badge */}
       {ticket.delegatedFrom && (
         <View style={fs.delegateBadge}>
           <Feather name="corner-down-right" size={11} color="#7c3aed" />
@@ -475,7 +463,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </View>
       )}
 
-      {/* WAB Complaints */}
       {ticket.wabComplaints ? (
         <View style={fs.complaintBox}>
           <Feather name="message-square" size={12} color="#0054a6" />
@@ -483,7 +470,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </View>
       ) : null}
 
-      {/* Assigned technician (distributed tab only) */}
       {!isUndistributed && job.assignedTechnician && (
         <View style={fs.techAssigned}>
           <Feather name="tool" size={12} color="#15803d" />
@@ -494,7 +480,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </View>
       )}
 
-      {/* Recommendations collapsible */}
       {!isUndistributed && job.recommendations.length > 0 && (
         <>
           <TouchableOpacity style={fs.expandRow} onPress={() => setRecExpanded(v => !v)}>
@@ -523,7 +508,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </>
       )}
 
-      {/* Tracking entries collapsible */}
       {!isUndistributed && job.trackingEntries.length > 0 && (
         <>
           <TouchableOpacity style={fs.expandRow} onPress={() => setTrackExpanded(v => !v)}>
@@ -543,7 +527,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </>
       )}
 
-      {/* Action Buttons */}
       {isUndistributed ? (
         <TouchableOpacity style={[globalStyles.actionBtn, { backgroundColor: COLORS.accentBlue, flexDirection: 'row', justifyContent: 'center', gap: 6 }]} onPress={onAssign}>
           <Feather name="user-plus" size={14} color="#fff" />
@@ -551,7 +534,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </TouchableOpacity>
       ) : !isCompleted ? (
         <View style={{ marginTop: 10 }}>
-          {/* Row 1: Recommendation + Tracking chips */}
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
             <TouchableOpacity
               style={[fs.actionChip, { borderColor: '#0054a6' }]}
@@ -568,7 +550,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
               <Text style={[fs.actionChipText, { color: '#d97706' }]}>+ Tracking</Text>
             </TouchableOpacity>
           </View>
-          {/* Row 2: Delegate + Finish Job */}
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity style={[globalStyles.actionBtn, { flex: 1, backgroundColor: '#64748b', marginTop: 0, flexDirection: 'row', justifyContent: 'center', gap: 5 }]} onPress={onDelegate}>
               <Feather name="corner-up-right" size={13} color="#fff" />
@@ -590,7 +571,6 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
   );
 }
 
-// Main: ForemanScreen
 const DEFAULT_JOB = { assignedTechnician: null, status: 'Undistributed', recommendations: [], trackingEntries: [] };
 
 export default function ForemanScreen({
@@ -601,11 +581,7 @@ export default function ForemanScreen({
   onUpdateTracking,
 }) {
   const [activeTab, setActiveTab] = useState('undistributed');
-
-  // Foreman-local job state (recommendations, tracking, assign, etc.)
   const [jobs, setJobs] = useState({});
-
-  // Modal state
   const [assignModal, setAssignModal] = useState({ visible: false, ticket: null });
   const [recModal, setRecModal] = useState({ visible: false, ticketId: null, existingRec: null });
   const [delRecModal, setDelRecModal] = useState({ visible: false, ticketId: null, rec: null });
@@ -623,7 +599,6 @@ export default function ForemanScreen({
     }));
   }, []);
 
-  // Tickets eligible for foreman view (WAB done or in-progress)
   const eligibleTickets = tickets.filter(t => {
     const s = String(t.status || '');
     return s === 'Inspected' || s === 'WabDone' || s === 'InService' || s === 'ServiceCompleted';
@@ -637,7 +612,6 @@ export default function ForemanScreen({
   const inProgressCount = distributedTickets.filter(t => getJob(t.ticketId).status === 'InProgress').length;
   const completedCount = distributedTickets.filter(t => getJob(t.ticketId).status === 'Completed').length;
 
-  // ── Handlers ─────────────────────────────────────────────────
   const handleAssign = (ticket, { tech, stallName }) => {
     updateJob(ticket.ticketId, { assignedTechnician: { ...tech, stallName }, status: 'InProgress' });
     onUpdateTracking?.({ ticketId: ticket.ticketId, stallName, technicianName: tech.name, foremanRecommendation: '', addExtraMinutes: 0 });
@@ -679,7 +653,6 @@ export default function ForemanScreen({
   };
 
   const handleDelegateForeman = (ticketId, foreman) => {
-    // Mark as delegated so it disappears from this foreman's view
     updateJob(ticketId, { status: 'Delegated', delegatedTo: foreman.name });
     setDelegModal({ visible: false, ticketId: null });
     Alert.alert('✓ Tugas Didelegasikan', `Berhasil dipindahkan ke ${foreman.name}.\nPekerjaan masuk ke antrian "Belum Terdistribusi" ${foreman.name}.`);
@@ -701,7 +674,6 @@ export default function ForemanScreen({
     );
   };
 
-  // Modal data helpers
   const assignTicket = assignModal.ticket;
   const recTicketId = recModal.ticketId;
   const trackTicketId = trackModal.ticketId;
@@ -716,14 +688,12 @@ export default function ForemanScreen({
         Masuk sebagai: <Text style={{ fontWeight: 'bold', color: COLORS.primary }}>{foremanCurrentName}</Text>
       </Text>
 
-      {/* Metric Cards */}
       <View style={fs.metricsRow}>
         <MetricCard label="Antri" value={undistributedTickets.length} color="#0054a6" icon="inbox" />
         <MetricCard label="Dikerjakan" value={inProgressCount} color="#d97706" icon="tool" />
         <MetricCard label="Selesai" value={completedCount} color="#15803d" icon="check-circle" />
       </View>
 
-      {/* Tab Toggle */}
       <View style={fs.tabRow}>
         {[
           { id: 'undistributed', label: 'Belum Terdistribusi', icon: 'inbox' },
@@ -736,17 +706,11 @@ export default function ForemanScreen({
               onPress={() => setActiveTab(tab.id)}>
               <Feather name={tab.icon} size={13} color={isActive ? '#fff' : '#64748b'} />
               <Text style={[fs.tabBtnText, isActive && { color: '#fff' }]}>{tab.label}</Text>
-              {tab.count > 0 && (
-                <View style={[fs.tabCount, { backgroundColor: isActive ? 'rgba(255,255,255,0.3)' : COLORS.accentBlue }]}>
-                  <Text style={fs.tabCountText}>{tab.count}</Text>
-                </View>
-              )}
             </TouchableOpacity>
           );
         })}
       </View>
 
-      {/* ── Tab: Belum Terdistribusi ── */}
       {activeTab === 'undistributed' && (
         <View style={{ marginTop: 4 }}>
           {undistributedTickets.length === 0 ? (
@@ -765,7 +729,6 @@ export default function ForemanScreen({
         </View>
       )}
 
-      {/* ── Tab: Distribusi Pekerjaan ── */}
       {activeTab === 'distributed' && (
         <View style={{ marginTop: 4 }}>
           {distributedTickets.length === 0 ? (
@@ -791,7 +754,6 @@ export default function ForemanScreen({
         </View>
       )}
 
-      {/* ── Modals ── */}
       <AssignTechnicianModal
         visible={assignModal.visible}
         ticket={assignTicket}
@@ -832,7 +794,6 @@ export default function ForemanScreen({
   );
 }
 
-// StyleSheets
 const ms = StyleSheet.create({
   overlay: {
     flex: 1,

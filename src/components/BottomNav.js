@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
 export default function BottomNav({ userRole, activeTab, setActiveTab }) {
@@ -7,18 +7,22 @@ export default function BottomNav({ userRole, activeTab, setActiveTab }) {
     ? [
       { id: 'bookings', label: 'List Booking', icon: 'list' },
       { id: 'daftar-tamu', label: 'Daftar Tamu', icon: 'users' },
+      { id: 'menu-hub', isSuzukiLogo: true },
       { id: 'history', label: 'History', icon: 'clock' },
       { id: 'account', label: 'Akun', icon: 'user' },
     ]
     : userRole === 'Foreman'
       ? [
         { id: 'foreman', label: 'Workshop', icon: 'tool' },
+        { id: 'daftar-tamu', label: 'Daftar Tamu', icon: 'users' },
+        { id: 'menu-hub', isSuzukiLogo: true },
         { id: 'history', label: 'History', icon: 'clock' },
         { id: 'account', label: 'Akun', icon: 'user' },
       ]
       : [
         { id: 'daftar-tamu', label: 'Daftar Tamu', icon: 'users' },
         { id: 'wab-form', label: 'Form WAB', icon: 'file-text' },
+        { id: 'menu-hub', isSuzukiLogo: true },
         { id: 'history', label: 'History', icon: 'clock' },
         { id: 'account', label: 'Akun', icon: 'user' },
       ];
@@ -33,14 +37,32 @@ export default function BottomNav({ userRole, activeTab, setActiveTab }) {
             style={styles.bottomNavItem}
             onPress={() => setActiveTab(item.id)}
           >
-            <Feather
-              name={item.icon}
-              size={18}
-              color={isActive ? '#0f172a' : '#94a3b8'}
-            />
-            <Text style={[styles.bottomNavText, isActive && styles.bottomNavTextActive]}>
-              {item.label}
-            </Text>
+            {item.isSuzukiLogo ? (
+              <View style={styles.heroLogoWrapper}>
+                <Image
+                  source={require('../../assets/s_logo.png')}
+                  fadeDuration={0}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    resizeMode: 'contain',
+                    opacity: isActive ? 1 : 0.5,
+                    transform: [{ scale: isActive ? 1.15 : 1 }]
+                  }}
+                />
+              </View>
+            ) : (
+              <>
+                <Feather
+                  name={item.icon}
+                  size={18}
+                  color={isActive ? '#0f172a' : '#94a3b8'}
+                />
+                <Text style={[styles.bottomNavText, isActive && styles.bottomNavTextActive]}>
+                  {item.label}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -59,6 +81,10 @@ const styles = StyleSheet.create({
   },
   bottomNavItem: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroLogoWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
   },

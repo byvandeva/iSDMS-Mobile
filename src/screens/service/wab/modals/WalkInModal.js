@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Feather } from '@expo/vector-icons';
 import { globalStyles } from '../../../../config/theme';
 
-const OCR_SPACE_API_KEY = 'K89836873688957';
+const OCR_SPACE_API_KEY = process.env.EXPO_PUBLIC_OCR_SPACE_API_KEY || 'K89836873688957';
 
 export default function WalkInModal({
   visible,
@@ -51,25 +51,21 @@ export default function WalkInModal({
     if (!rawText) return '';
     const cleanText = rawText.toUpperCase().replace(/\r?\n|\r/g, ' ').replace(/[^A-Z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 
-    // 1. Strict match: e.g. B 1234 ABC or B 123 ABC
     const strictMatch = cleanText.match(/\b([A-Z]{1,2})\s*([0-9]{1,4})\s*([A-Z]{1,3})\b/);
     if (strictMatch) {
       return `${strictMatch[1]} ${strictMatch[2]} ${strictMatch[3]}`;
     }
 
-    // 2. Unspaced match: e.g. B1234ABC -> B 1234 ABC
     const unspacedMatch = cleanText.match(/([A-Z]{1,2})([0-9]{1,4})([A-Z]{1,3})/);
     if (unspacedMatch) {
       return `${unspacedMatch[1]} ${unspacedMatch[2]} ${unspacedMatch[3]}`;
     }
 
-    // 3. Partial match: e.g. B 1234 or 1234 ABC
     const partialMatch = cleanText.match(/([A-Z]{1,2}\s*[0-9]{1,4}|[0-9]{1,4}\s*[A-Z]{1,3})/);
     if (partialMatch) {
       return partialMatch[0];
     }
 
-    // 4. Return cleaned alphanumeric text if long enough
     const alphaNumOnly = cleanText.replace(/[^A-Z0-9 ]/g, '').trim();
     if (alphaNumOnly.length >= 3) {
       return alphaNumOnly;
@@ -105,7 +101,6 @@ export default function WalkInModal({
         });
 
         if (response.status === 429) {
-          // Rate limited — wait 1 second and retry once
           await new Promise(r => setTimeout(r, 1000));
           response = await fetch('https://api.ocr.space/parse/image', {
             method: 'POST',
@@ -194,7 +189,7 @@ export default function WalkInModal({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 }}>
-        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 12 }}>
+        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0f172a' }}>Walk-In</Text>
             <TouchableOpacity

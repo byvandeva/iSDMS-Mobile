@@ -12,7 +12,7 @@ export default function Header() {
           contentFit="contain"
         />
         <View style={{ borderLeftWidth: 1, borderLeftColor: '#cbd5e1', paddingLeft: 10 }}>
-          <Text style={styles.headerTitle}>Suzuki Dealer Portal</Text>
+          <Text style={styles.headerTitle}>SDMS</Text>
         </View>
       </View>
     </View>

@@ -1,10 +1,6 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-/**
- * Resolves the backend host IP at runtime.
- * Works across: Expo Go (LAN), Android emulator, web/browser.
- */
 function resolveHostIp() {
   try {
     const hostUri =

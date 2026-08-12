@@ -1,6 +1,3 @@
-/**
- * Converts arrival purpose value (enum or string) into a clean display label.
- */
 export function getPurposeString(purpose) {
   if (purpose === null || purpose === undefined || purpose === '') return 'Service';
   let raw = typeof purpose === 'object' ? (purpose.id || purpose.label || purpose.name || '') : purpose;
@@ -12,9 +9,6 @@ export function getPurposeString(purpose) {
   return str || 'Service';
 }
 
-/**
- * Converts ticket status value (enum or string) into a user-friendly Indonesian status string.
- */
 export function getStatusString(status) {
   if (status === null || status === undefined || status === '') return 'Check-In';
   const s = String(status).toLowerCase().trim();

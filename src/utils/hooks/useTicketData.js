@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchTickets } from '../services/api';
 
-/**
- * Hook that polls for ticket data every 10 seconds.
- * Exposes tickets, loading state, and a manual refresh.
- */
 export function useTicketData(pollingIntervalMs = 10000) {
   const [tickets, setTickets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

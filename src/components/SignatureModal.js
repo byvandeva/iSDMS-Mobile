@@ -61,7 +61,6 @@ export default function SignatureModal({ visible, onClose, onSave, title, subtit
             {subtitle || 'Silakan tanda tangan di dalam area berikut untuk persetujuan WAB.'}
           </Text>
 
-          {/* SIGNATURE CANVAS BOX (PREVENTS SCROLLING) */}
           <View
             {...panResponder.panHandlers}
             style={{
@@ -135,7 +134,6 @@ export default function SignatureModal({ visible, onClose, onSave, title, subtit
             )}
           </View>
 
-          {/* ACTION BUTTONS (HAPUS, BATAL, SIMPAN) */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <TouchableOpacity onPress={handleClear} style={{ paddingVertical: 6, paddingHorizontal: 10 }}>
               <Text style={{ fontSize: 13, color: '#be123c', fontWeight: 'bold' }}>Hapus</Text>

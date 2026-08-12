@@ -1,7 +1,3 @@
-/**
- * Queue Priority & Interleaving Service for Mobile Tablet App
- */
-
 export function isPriorityBooking(item) {
   if (!item) return false;
   const sdmsId = item.sdmsBookingId || item.SdmsBookingId;

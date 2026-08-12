@@ -1,46 +1,37 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { globalStyles, COLORS } from '../../../config/theme';
-import { getPurposeString, getStatusString } from '../../../utils/helpers';
+import { getPurposeString } from '../../../utils/helpers';
 import { interleavePriorityQueue } from '../../../utils/queuePriority';
 
-export default function GuestListScreen({
+export default function Guests({
   tickets,
   userRole,
-  searchQuery,
-  setSearchQuery,
-  filterPurpose,
-  setFilterPurpose,
   onStartWab,
-  onOpenEditModal,
   onOpenCheckOutModal,
-  onViewWabHistory,
+  onOpenEditModal,
+  onViewWabHistory
 }) {
-  const baseFiltered = tickets
-    .filter(t => t.status !== 'CheckedOut')
-    .filter(t => {
-      const q = searchQuery.toLowerCase().trim();
-      const plateMatch = (t.licensePlate || '').toLowerCase().includes(q);
-      const modelMatch = (t.vehicleModel || '').toLowerCase().includes(q);
-      const custMatch = (t.customerName || '').toLowerCase().includes(q);
-      const queueMatch = (t.queueNumber || '').toLowerCase().includes(q);
-      const matchesSearch = !q || plateMatch || modelMatch || custMatch || queueMatch;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterPurpose, setFilterPurpose] = useState('All');
 
-      const purposeStr = getPurposeString(t.arrivalPurpose);
-      const matchesPurpose = filterPurpose === 'All' || purposeStr.toLowerCase() === filterPurpose.toLowerCase();
+  const filteredTickets = tickets.filter(t => t.status !== 'CheckedOut').filter(t => {
+    const purposeMatch = filterPurpose === 'All' || getPurposeString(t.arrivalPurpose) === filterPurpose;
+    const plate = (t.licensePlate || '').toLowerCase();
+    const model = (t.vehicleModel || '').toLowerCase();
+    const cust = (t.customerName || '').toLowerCase();
+    const q = searchQuery.toLowerCase();
+    const searchMatch = !q || plate.includes(q) || model.includes(q) || cust.includes(q);
+    return purposeMatch && searchMatch;
+  });
 
-      return matchesSearch && matchesPurpose;
-    });
-
-  // Under-the-hood 2:1 queue sorting
-  const interleavedTickets = interleavePriorityQueue(baseFiltered);
+  const interleavedTickets = interleavePriorityQueue(filteredTickets);
 
   return (
     <View style={globalStyles.card}>
       <Text style={globalStyles.cardTitle}>Daftar Tamu</Text>
 
-      {/* SEARCH INPUT */}
       <TextInput
         style={[globalStyles.input, { marginBottom: 10 }]}
         placeholder="Cari Plat / Model / Customer..."
@@ -48,7 +39,6 @@ export default function GuestListScreen({
         onChangeText={setSearchQuery}
       />
 
-      {/* PURPOSE FILTER CHIPS */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 14, flexDirection: 'row' }}>
         {['All', 'Service', 'Sales', 'BodyRepair', 'SparePart'].map(p => (
           <TouchableOpacity
@@ -74,17 +64,16 @@ export default function GuestListScreen({
       ) : (
         interleavedTickets.map((t, idx) => {
           const isService = getPurposeString(t.arrivalPurpose) === 'Service';
-          const isWabDone = t.status === 'Inspected' || t.status === 'WabDone' || t.wabSubmitted;
-          const isWabInProgress = t.status === 'WabInProgress' || t.status === 'InProgress' || t.status === 'In Progress';
+          const statusStr = String(t.status || '');
+          const isWabDone = Boolean(t.wabSubmitted) || ['Inspected', 'WabDone', '1', 'AssignedToStall', '2', 'InService', '3', 'PendingAdditionalApproval', '4', 'ServiceCompleted', '5', 'PreHandoverReady', '6', 'HandoverCompleted', '7', 'CheckedOut', '8'].includes(statusStr);
+          const isWabInProgress = statusStr === 'WabInProgress' || statusStr === 'InProgress' || statusStr === 'In Progress';
 
           return (
             <View key={t.ticketId || idx} style={globalStyles.itemBox}>
-              {/* TOP ROW WITH QUEUE BADGE, STATUS BADGE & PLATE */}
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={globalStyles.queueBadge}>{t.queueNumber || 'Non-Service'}</Text>
-                  
-                  {/* STATUS BADGE */}
+
                   {isWabDone && (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#059669', borderWidth: 1, borderColor: '#059669', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
                       <Feather name="check-circle" size={11} color="#ffffff" />
@@ -106,12 +95,14 @@ export default function GuestListScreen({
                 <Text style={globalStyles.plateText}>{t.licensePlate}</Text>
               </View>
 
-              <Text style={globalStyles.customerText}>{t.customerName || '-'}</Text>
-              <Text style={globalStyles.subDetailText}>Tujuan: {getPurposeString(t.arrivalPurpose)} &bull; Model: {t.vehicleModel}</Text>
+              <Text style={globalStyles.subDetailText}>
+                Booking: {t.reservasiTime || t.bookingTime || '-'} &bull; Check-In: {t.checkInTime ? new Date(t.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
+              </Text>
+              <Text style={globalStyles.subDetailText}>
+                Tujuan: {getPurposeString(t.arrivalPurpose)} &bull; Tipe: {t.groupCode || t.vehicleModel}
+              </Text>
 
-              {/* ACTION BUTTONS SIDE-BY-SIDE IN ONE ROW */}
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-                {/* WAB ACTION BUTTON (SA / ADMIN) */}
                 {userRole === 'ServiceAdvisor' && isService && (
                   <TouchableOpacity
                     style={[
@@ -125,12 +116,11 @@ export default function GuestListScreen({
                     onPress={() => isWabDone ? (onViewWabHistory && onViewWabHistory(t)) : onStartWab(t)}
                   >
                     <Text style={globalStyles.actionBtnText}>
-                      {isWabDone ? 'Lihat WAB' : isWabInProgress ? 'Lanjutkan WAB' : 'Mulai WAB'}
+                      {isWabDone ? 'Lihat' : isWabInProgress ? 'Lanjutkan' : 'Mulai'}
                     </Text>
                   </TouchableOpacity>
                 )}
 
-                {/* EDIT BUTTON */}
                 {(userRole === 'Security' || userRole === 'ServiceAdvisor' || userRole === 'Admin') && (
                   <TouchableOpacity
                     style={[globalStyles.actionBtn, { flex: 1, backgroundColor: '#64748b', marginTop: 0 }]}
@@ -140,7 +130,6 @@ export default function GuestListScreen({
                   </TouchableOpacity>
                 )}
 
-                {/* CHECK-OUT BUTTON */}
                 {(userRole === 'Security' || userRole === 'Admin') && (
                   <TouchableOpacity
                     style={[globalStyles.actionBtn, { flex: 1, backgroundColor: COLORS.primary, marginTop: 0 }]}

@@ -7,7 +7,7 @@ export default function EditTicketModal({ visible, onClose, editForm, setEditFor
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 }}>
-        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 12 }}>
+        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 20 }}>
           
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0f172a' }}>Edit Data Kendaraan & Tujuan</Text>

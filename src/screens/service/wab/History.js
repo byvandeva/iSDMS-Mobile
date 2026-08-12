@@ -18,7 +18,6 @@ function formatDateTime(iso) {
 const SEVERITY_COLOR = { Low: '#059669', Medium: '#d97706', High: '#dc2626' };
 const DAMAGE_ICON = { Scratch: 'minus', Dent: 'circle', Crack: 'alert-triangle', Paint: 'droplet' };
 
-/* 1. VEHICLE DETAIL MODAL (FOR SECURITY CHECK-OUT HISTORY & VEHICLE INFO ONLY) */
 function VehicleDetailModal({ visible, entry, onClose }) {
   if (!entry) return null;
   const t = entry;
@@ -98,7 +97,6 @@ function VehicleDetailModal({ visible, entry, onClose }) {
   );
 }
 
-/* 2. WAB DETAIL MODAL (FOR SERVICE ADVISOR WAB HISTORY ONLY) */
 function WabDetailModal({ visible, wabEntry, onClose }) {
   if (!wabEntry) return null;
   const t = wabEntry;
@@ -199,7 +197,7 @@ function WabDetailModal({ visible, wabEntry, onClose }) {
 
 export default function WabHistoryScreen({ userRole = 'Admin', wabHistory = [], historyTickets = [], allTickets = [], initialTicketId = null, onClearInitialTicket }) {
   const [selectedEntry, setSelectedEntry] = useState(null);
-  const [modalType, setModalType] = useState('vehicle'); // 'vehicle' | 'wab'
+  const [modalType, setModalType] = useState('vehicle');
   const [modalVisible, setModalVisible] = useState(false);
   
   const [activeTabSegment, setActiveTabSegment] = useState(
@@ -248,7 +246,7 @@ export default function WabHistoryScreen({ userRole = 'Admin', wabHistory = [], 
     }
   }, [initialTicketId, wabHistory, allTickets]);
 
-  const cardTitle = userRole === 'Security' ? 'Riwayat Check-Out Gerbang' :
+  const cardTitle = userRole === 'Security' ? 'Riwayat Check-Out' :
                     userRole === 'ServiceAdvisor' ? 'Riwayat Form WAB' :
                     userRole === 'Foreman' ? 'Riwayat Pengerjaan Bengkel' : 'Riwayat Transaksi & Pengerjaan';
 

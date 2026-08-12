@@ -24,6 +24,7 @@ import HistoryScreen from './src/screens/service/wab/History.js';
 import ForemanScreen from './src/screens/service/wab/Foreman.js';
 import DrhDashboardScreen from './src/screens/service/drh/Index.js';
 import SparepartScreen from './src/screens/sparepart/Index.js';
+import MenuHubScreen from './src/screens/menu/MenuHub.js';
 
 // Modals
 import WalkInModal from './src/screens/service/wab/modals/WalkInModal.js';
@@ -41,7 +42,7 @@ export default function App() {
   const [mobileShowPassword, setMobileShowPassword] = useState(false);
   const [mobileSelectedRole, setMobileSelectedRole] = useState('ServiceAdvisor');
 
-  const [activeTab, setActiveTab] = useState('bookings');
+  const [activeTab, setActiveTab] = useState('menu-hub');
   const [searchQuery, setSearchQuery] = useState('');
   const [bookingSearchQuery, setBookingSearchQuery] = useState('');
   const [filterPurpose, setFilterPurpose] = useState('All');
@@ -164,9 +165,7 @@ export default function App() {
   const handleLogin = (role) => {
     const targetRole = role || mobileSelectedRole;
     setUserRole(targetRole);
-    if (targetRole === 'Security') setActiveTab('bookings');
-    if (targetRole === 'ServiceAdvisor') setActiveTab('daftar-tamu');
-    if (targetRole === 'Foreman') setActiveTab('foreman');
+    setActiveTab('menu-hub');
     setIsLoggedIn(true);
   };
 
@@ -214,13 +213,24 @@ export default function App() {
     const purposeEnum = selectedPurposeStr === 'Service' ? 0 : selectedPurposeStr === 'Sales' ? 1 : selectedPurposeStr === 'BodyRepair' ? 2 : 3;
     const inputPlate = (data.licensePlate || '').toUpperCase().trim();
 
+    const bookingId = data.bookingNo || data.sdmsBookingId || data.queueNumber;
+    const qNum = (type === 'booking' || bookingId)
+      ? bookingId
+      : (isService ? 'W-' + Math.floor(100 + Math.random() * 900) : null);
+
     const newTicket = {
       ticketId: 't-' + Date.now(),
-      queueNumber: isService ? 'W-' + Math.floor(100 + Math.random() * 900) : null,
+      queueNumber: qNum,
+      bookingNo: bookingId || null,
+      sdmsBookingId: bookingId || null,
       licensePlate: inputPlate,
-      vehicleModel: data.vehicleModel || 'Suzuki Vehicle',
+      policeRegNo: inputPlate,
+      vehicleModel: data.groupCode || data.vehicleModel || 'Suzuki Vehicle',
+      groupCode: data.groupCode || data.vehicleModel || 'Suzuki Vehicle',
       arrivalPurpose: selectedPurposeStr,
       customerName: data.customerName || '',
+      reservasiTime: data.reservasiTime || data.bookingTime || data.ReservasiTime || null,
+      bookingTime: data.reservasiTime || data.bookingTime || data.ReservasiTime || null,
       status: 'CheckedIn',
       checkInTime: new Date().toISOString()
     };
@@ -639,6 +649,10 @@ export default function App() {
             initialTicketId={viewWabHistoryTicketId}
             onClearInitialTicket={() => setViewWabHistoryTicketId(null)}
           />
+        )}
+
+        {activeTab === 'menu-hub' && (
+          <MenuHubScreen userRole={userRole} onSelectMenu={setActiveTab} />
         )}
 
         {activeTab === 'account' && (

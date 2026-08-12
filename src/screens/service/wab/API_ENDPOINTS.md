@@ -1,29 +1,29 @@
-# Dokumentasi Endpoint SDMS — Mobile WAB System
+# API Endpoints & Data Model Document — Modul WAB Mobile
 
-Dokumen ini mencatat endpoint WAB System yang dipanggil oleh Mobile app.
+Dokumentasi endpoint API SDMS dan skema data tabel `Booking` SDMS yang dikonsumsi oleh modul WAB Mobile App.
 
 ---
 
-## 1. Get List Booking
+## 1. Skema Data Tabel Booking SDMS
 
-- **Path**: `/api/v1/services/wab/bookings`
-- **Method**: `GET`
-- **Auth Required**: Ya (`Bearer <token>`)
+```sql
+CompanyCode	BranchCode	BookingNo	ReservasiDate	ReservasiTime	StallCode	BookingSource	CustomerName	TelponNo	PoliceRegNo	GroupCode	Odometer	JobType	JobTime	AdditionalTime	FinishJobTime	FinishTime	ServiceRequest	Remark	ServiceAdvisor	ForemanID	MechanicID	CreatedBy	CreatedDate	UpdatedBy	UpdatedDate
+```
 
-## 2. Get List Tickets (Daftar Tamu)
+### Pemetaan Kolom SDMS Raw ke Property Client Mobile
 
-- **Path**: `/api/v1/services/wab/tickets`
-- **Method**: `GET`
-- **Auth Required**: Ya (`Bearer <token>`)
-
-## 3. Submit Check-In Gerbang (Security)
-
-- **Path**: `/api/v1/services/wab/check-in`
-- **Method**: `POST`
-- **Auth Required**: Ya (`Bearer <token>`)
-
-## 4. Submit Form WAB (Service Advisor)
-
-- **Path**: `/api/v1/services/wab/form`
-- **Method**: `POST`
-- **Auth Required**: Ya (`Bearer <token>`)
+| Kolom SDMS Raw | Property Client | Contoh Nilai |
+|---|---|---|
+| `CompanyCode` | `companyCode` | `"6006406"` |
+| `BranchCode` | `branchCode` | `"6006401"` |
+| `BookingNo` | `bookingNo` / `sdmsBookingId` | `"BO401/25/002479"` |
+| `ReservasiDate` | `reservasiDate` | `"2026-02-26 00:00:00.000"` |
+| `ReservasiTime` | `reservasiTime` / `bookingTime` | `"09:30"` |
+| `StallCode` | `stallCode` | `"STALL-01"` |
+| `CustomerName` | `customerName` | `"ANANTYA NALA PRABATA"` |
+| `TelponNo` | `telponNo` / `customerPhone` | `"08118207657"` |
+| `PoliceRegNo` | `policeRegNo` / `licensePlate` | `"B1697TYK"` |
+| `GroupCode` | `groupCode` / `vehicleModel` | `"SWIFT (CBU)"` |
+| `Odometer` | `odometer` | `2222222` |
+| `JobType` | `jobType` / `serviceType` | `"PAKET 10.000 KM"` |
+| `ServiceAdvisor` | `serviceAdvisor` | `"58970"` |
