@@ -322,7 +322,6 @@ export default function WabFormScreen({
         </View>
       )}
 
-      {/* STEP 4: 360 + FUNCTIONAL INSPECTION */}
       {wabStep === 4 && (
         <View>
           <Text style={globalStyles.cardTitle}>Step 4: Inspeksi Bodi & Fungsi Komponen</Text>

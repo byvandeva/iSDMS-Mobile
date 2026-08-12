@@ -9,9 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StatusBar
+  StatusBar,
+  Image
 } from 'react-native';
-import { Image } from 'expo-image';
 import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../../config/theme';
 
@@ -35,7 +35,7 @@ export default function LoginScreen({
 
       <View style={styles.topHeader}>
         <Image
-          source={require('../../../assets/suzuki_white_logo.svg')}
+          source={require('../../../assets/suzuki_white_logo.png')}
           style={styles.logoImage}
           contentFit="contain"
         />

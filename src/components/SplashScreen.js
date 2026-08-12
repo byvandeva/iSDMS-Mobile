@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, Easing, Dimensions, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Animated, Easing, Dimensions, StyleSheet, Image } from 'react-native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const AnimatedExpoImage = Animated.createAnimatedComponent(Image);
@@ -84,7 +83,7 @@ export default function SplashScreen({ onFinish }) {
           }}
         >
           <AnimatedExpoImage
-            source={require('../../assets/suzuki_white_logo.svg')}
+            source={require('../../assets/suzuki_white_logo.png')}
             style={styles.logoImage}
             contentFit="contain"
           />

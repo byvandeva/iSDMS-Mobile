@@ -1,15 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 export default function Header() {
   return (
     <View style={styles.header}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <Image
-          source={require('../../assets/suzuki_logo.svg')}
-          style={{ width: 105, height: 36 }}
-          contentFit="contain"
+          source={require('../../assets/suzuki_logo.png')}
+          style={{ width: 105, height: 36, resizeMode: 'contain' }}
         />
         <View style={{ borderLeftWidth: 1, borderLeftColor: '#cbd5e1', paddingLeft: 10 }}>
           <Text style={styles.headerTitle}>SDMS</Text>
