@@ -101,7 +101,20 @@ function WabDetailModal({ visible, wabEntry, onClose }) {
   if (!wabEntry) return null;
   const t = wabEntry;
   const damages = t.wabDamages || t.damages || [];
-  const inspections = t.wabInspections || [];
+  const inspections = t.wabInspections || t.functionalInspections || [];
+
+  const custName = t.wabCustomerName || t.customerName || '-';
+  const driverName = t.driverName || t.saDriverName || '';
+  const custPhone = t.wabCustomerPhone || t.customerPhone || t.telponNo || '-';
+  const custEmail = t.customerEmail || t.saCustomerEmail || '';
+  const identityNo = t.identityNo || t.saIdentityNo || '';
+  const licensePlate = (t.licensePlate || t.policeRegNo || '-').toUpperCase();
+  const vehicleModel = t.vehicleModel || t.groupCode || '-';
+  const odometerVal = t.odometer ? `${Number(t.odometer).toLocaleString('id-ID')} KM` : '-';
+  const addressVal = t.customerAddress || t.saCustomerAddress || '';
+  const complaintsVal = t.wabComplaints || t.customerComplaints || 'Tidak ada keluhan khusus.';
+  const serviceTypeVal = t.wabServiceType || t.serviceType || t.jobType || '-';
+  const queueNo = t.queueNumber || 'Non-Service';
 
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
@@ -111,7 +124,7 @@ function WabDetailModal({ visible, wabEntry, onClose }) {
           <View style={styles.modalHeader}>
             <View>
               <Text style={styles.modalTitle}>Detail Form WAB SA</Text>
-              <Text style={styles.modalSubtitle}>{t.licensePlate} · {t.vehicleModel || '-'}</Text>
+              <Text style={styles.modalSubtitle}>{licensePlate} · Antrian: {queueNo}</Text>
             </View>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Feather name="x" size={22} color="#64748b" />
@@ -119,67 +132,132 @@ function WabDetailModal({ visible, wabEntry, onClose }) {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
-            {/* CUSTOMER INFO */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Informasi Pelanggan & Servis</Text>
-              <View style={styles.infoRow}>
-                <Feather name="user" size={14} color="#64748b" />
-                <Text style={styles.infoText}>{t.wabCustomerName || t.customerName || '-'}</Text>
+            {/* 1. PELANGGAN & KENDARAAN */}
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#0054a6', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 6 }}>
+                Data Pelanggan & Kendaraan
+              </Text>
+              
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Nama Pelanggan:</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{custName}</Text>
               </View>
-              <View style={styles.infoRow}>
-                <Feather name="phone" size={14} color="#64748b" />
-                <Text style={styles.infoText}>{t.wabCustomerPhone || t.customerPhone || '-'}</Text>
+
+              {driverName ? (
+                <View style={styles.infoRowUnderlined}>
+                  <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Nama Pengemudi:</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{driverName}</Text>
+                </View>
+              ) : null}
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>No. Telepon / WA:</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{custPhone}</Text>
               </View>
-              <View style={styles.infoRow}>
-                <Feather name="message-square" size={14} color="#64748b" />
-                <Text style={styles.infoText}>Keluhan: {t.wabComplaints || t.customerComplaints || '-'}</Text>
+
+              {custEmail ? (
+                <View style={styles.infoRowUnderlined}>
+                  <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Email Pelanggan:</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{custEmail}</Text>
+                </View>
+              ) : null}
+
+              {identityNo ? (
+                <View style={styles.infoRowUnderlined}>
+                  <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>No. KTP / Identitas:</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{identityNo}</Text>
+                </View>
+              ) : null}
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Nomor Polisi:</Text>
+                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#0f172a', flex: 1 }}>{licensePlate}</Text>
               </View>
-              <View style={styles.infoRow}>
-                <Feather name="tool" size={14} color="#64748b" />
-                <Text style={styles.infoText}>Jenis Servis: {t.wabServiceType || t.serviceType || '-'}</Text>
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Model Kendaraan:</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{vehicleModel}</Text>
               </View>
-              <View style={styles.infoRow}>
-                <Feather name="clock" size={14} color="#64748b" />
-                <Text style={styles.infoText}>Waktu Submit: {formatDateTime(t.wabSubmittedAt || t.inspectionTime || t.checkInTime)}</Text>
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Odometer Saat Ini:</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{odometerVal}</Text>
+              </View>
+
+              {addressVal ? (
+                <View style={styles.infoRowUnderlined}>
+                  <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Alamat Domisili:</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>{addressVal}</Text>
+                </View>
+              ) : null}
+            </View>
+
+            {/* 2. PEKERJAAN SERVIS & KELUHAN */}
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#0054a6', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 6 }}>
+                Pekerjaan Servis & Keluhan
+              </Text>
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Keluhan Utama:</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1, lineHeight: 18 }}>{complaintsVal}</Text>
+              </View>
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Jenis Paket Servis:</Text>
+                <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#0054a6', flex: 1 }}>{serviceTypeVal}</Text>
+              </View>
+
+              <View style={styles.infoRowUnderlined}>
+                <Text style={{ fontSize: 12, color: '#64748b', width: 130 }}>Waktu Submit:</Text>
+                <Text style={{ fontSize: 12, color: '#334155', flex: 1 }}>{formatDateTime(t.wabSubmittedAt || t.inspectionTime || t.checkInTime)}</Text>
               </View>
             </View>
 
-            {/* DAMAGE LIST */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Titik Kerusakan Bodi ({damages.length})</Text>
+            {/* 3. CATATAN KERUSAKAN BODI */}
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#0054a6', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 6 }}>
+                Catatan Kerusakan Bodi ({damages.length} Titik)
+              </Text>
               {damages.length === 0 ? (
-                <Text style={styles.emptyText}>Tidak ada titik kerusakan tercatat.</Text>
+                <Text style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic', paddingVertical: 4 }}>
+                  Kondisi bodi mulus, tidak ada titik kerusakan tercatat.
+                </Text>
               ) : (
-                damages.map((d, idx) => (
-                  <View key={d.id || idx} style={styles.damageRow}>
-                    <Feather name={DAMAGE_ICON[d.damageType || d.type] || 'alert-circle'} size={14} color={SEVERITY_COLOR[d.severity] || '#64748b'} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.damageTitle}>{d.damageType || d.type || 'Scratch'} · Frame {d.frame || 1}</Text>
-                      <Text style={styles.damageNotes}>{d.notes || '-'}</Text>
+                damages.map((d, idx) => {
+                  const dotColor = d.severity === 'High' ? '#be123c' : d.severity === 'Medium' ? '#d97706' : '#15803d';
+                  return (
+                    <View key={d.id || idx} style={styles.infoRowUnderlined}>
+                      <Text style={{ color: dotColor, fontWeight: 'bold', fontSize: 14 }}>●</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#0f172a' }}>
+                          {d.damageType || d.type || 'Scratch'} &bull; Frame {d.frame || 1}
+                        </Text>
+                        <Text style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>{d.notes || '-'}</Text>
+                      </View>
+                      <Text style={{ fontSize: 11, fontWeight: 'bold', color: dotColor }}>
+                        {d.severity || 'Low'}
+                      </Text>
                     </View>
-                    <View style={[styles.severityBadge, { backgroundColor: (SEVERITY_COLOR[d.severity] || '#64748b') + '20', borderColor: SEVERITY_COLOR[d.severity] || '#64748b' }]}>
-                      <Text style={[styles.severityText, { color: SEVERITY_COLOR[d.severity] || '#64748b' }]}>{d.severity || 'Low'}</Text>
-                    </View>
-                  </View>
-                ))
+                  );
+                })
               )}
             </View>
 
-            {/* FUNCTIONAL INSPECTION */}
+            {/* 4. PEMERIKSAAN KOMPONEN & FUNGSI */}
             {inspections.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Inspeksi Fungsional</Text>
+              <View style={{ marginBottom: 16 }}>
+                <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#0054a6', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 6 }}>
+                  Pemeriksaan Komponen & Fungsi ({inspections.length} Item)
+                </Text>
                 {inspections.map((ins, idx) => (
-                  <View key={ins.id || idx} style={styles.inspRow}>
-                    <Feather
-                      name={ins.status === 'OK' ? 'check-circle' : ins.status === 'Perlu Perbaikan' ? 'alert-circle' : 'minus-circle'}
-                      size={14}
-                      color={ins.status === 'OK' ? '#059669' : ins.status === 'Perlu Perbaikan' ? '#dc2626' : '#94a3b8'}
-                    />
-                    <Text style={styles.inspName}>{ins.name}</Text>
-                    <Text style={[styles.inspStatus, {
-                      color: ins.status === 'OK' ? '#059669' : ins.status === 'Perlu Perbaikan' ? '#dc2626' : '#64748b'
-                    }]}>{ins.status}</Text>
+                  <View key={ins.id || idx} style={styles.infoRowUnderlined}>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: '#0f172a', flex: 1 }}>
+                      {ins.name}
+                    </Text>
+                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: ins.status === 'OK' ? '#15803d' : '#be123c' }}>
+                      {ins.status === 'OK' ? '✓ Baik' : '⚠ Perbaikan'}
+                    </Text>
                   </View>
                 ))}
               </View>

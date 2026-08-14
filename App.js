@@ -2,19 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Alert, RefreshControl, StyleSheet } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-// Services & Helpers
 import { API_BASE, HOST_IP } from './src/services/api.js';
 import { getPurposeString } from './src/utils/helpers.js';
 import { globalStyles, COLORS } from './src/config/theme.js';
 
-// Layout & Reusable UI Components
 import SplashScreen from './src/components/SplashScreen.js';
 import Header from './src/components/Header.js';
 import BottomNav from './src/components/BottomNav.js';
 import SignatureModal from './src/components/SignatureModal.js';
 import SuccessCheckInModal from './src/components/SuccessCheckInModal.js';
 
-// Screens
 import LoginScreen from './src/screens/auth/Login.js';
 import AccountScreen from './src/screens/auth/Account.js';
 import BookingListScreen from './src/screens/service/wab/Bookings.js';
@@ -26,7 +23,6 @@ import DrhDashboardScreen from './src/screens/service/drh/Index.js';
 import SparepartScreen from './src/screens/sparepart/Index.js';
 import MenuHubScreen from './src/screens/menu/MenuHub.js';
 
-// Modals
 import WalkInModal from './src/screens/service/wab/modals/WalkInModal.js';
 import EditTicketModal from './src/screens/service/wab/modals/EditTicketModal.js';
 import CheckOutModal from './src/screens/service/wab/modals/CheckOutModal.js';
@@ -77,8 +73,8 @@ export default function App() {
   const [checkingOutTicket, setCheckingOutTicket] = useState(null);
 
   const [assetPortIndex, setAssetPortIndex] = useState(0);
-  const assetPorts = ['5173', '5174', '5000'];
-  const currentAssetBase = `http://${HOST_IP}:${assetPorts[assetPortIndex]}`;
+  const assetPorts = ['5173', '5174', '5175'];
+  const currentAssetBase = `http://${HOST_IP}:${assetPorts[assetPortIndex]}/assets/360`;
 
   const [showSigModal, setShowSigModal] = useState(false);
   const [sigType, setSigType] = useState('customer');
@@ -89,14 +85,19 @@ export default function App() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [wabStep, setWabStep] = useState(1);
   const [saCustomerName, setSaCustomerName] = useState('');
+  const [saDriverName, setSaDriverName] = useState('');
   const [saCustomerPhone, setSaCustomerPhone] = useState('');
+  const [saCustomerEmail, setSaCustomerEmail] = useState('');
+  const [saIdentityNo, setSaIdentityNo] = useState('');
+  const [saPoliceRegNo, setSaPoliceRegNo] = useState('');
+  const [saVehicleModel, setSaVehicleModel] = useState('');
+  const [saOdometer, setSaOdometer] = useState('');
+  const [saCustomerAddress, setSaCustomerAddress] = useState('');
   const [customerComplaints, setCustomerComplaints] = useState('');
   const [serviceType, setServiceType] = useState('Periodic Service 10.000 KM');
 
   const [frameIndex, setFrameIndex] = useState(1);
-  const [damages, setDamages] = useState([
-    { id: '1', frame: 1, x: 45, y: 55, damageType: 'Scratch', severity: 'Low', notes: 'Baret halus di bumper depan' }
-  ]);
+  const [damages, setDamages] = useState([]);
   const [showDamageModal, setShowDamageModal] = useState(false);
   const [pendingTap, setPendingTap] = useState(null);
   const [damageType, setDamageType] = useState('Scratch');
@@ -345,7 +346,14 @@ export default function App() {
   const handleStartWab = async (t) => {
     setSelectedTicket(t);
     setSaCustomerName((!t.customerName || t.customerName === '-') ? '' : t.customerName);
-    setSaCustomerPhone(t.customerPhone || '');
+    setSaDriverName(t.driverName || '');
+    setSaCustomerPhone(t.customerPhone || t.telponNo || '');
+    setSaCustomerEmail(t.customerEmail || '');
+    setSaIdentityNo(t.identityNo || '');
+    setSaPoliceRegNo(t.policeRegNo || t.licensePlate || '');
+    setSaVehicleModel(t.groupCode || t.vehicleModel || '');
+    setSaOdometer(t.odometer ? String(t.odometer) : '');
+    setSaCustomerAddress(t.customerAddress || '');
     setWabStep(1);
     setActiveTab('wab-form');
 
@@ -365,25 +373,45 @@ export default function App() {
       return;
     }
 
-    // Save WAB snapshot to history
-    const wabEntry = {
+    const updatedTicket = {
       ...selectedTicket,
       status: 'WabDone',
       wabSubmitted: true,
       wabSubmittedAt: new Date().toISOString(),
+      customerName: saCustomerName,
       wabCustomerName: saCustomerName,
+      driverName: saDriverName,
+      saDriverName: saDriverName,
+      customerPhone: saCustomerPhone,
       wabCustomerPhone: saCustomerPhone,
+      customerEmail: saCustomerEmail,
+      saCustomerEmail: saCustomerEmail,
+      identityNo: saIdentityNo,
+      saIdentityNo: saIdentityNo,
+      licensePlate: (saPoliceRegNo || selectedTicket.licensePlate || '').toUpperCase(),
+      policeRegNo: (saPoliceRegNo || selectedTicket.licensePlate || '').toUpperCase(),
+      saPoliceRegNo: (saPoliceRegNo || selectedTicket.licensePlate || '').toUpperCase(),
+      vehicleModel: saVehicleModel || selectedTicket.vehicleModel,
+      saVehicleModel: saVehicleModel || selectedTicket.vehicleModel,
+      odometer: saOdometer,
+      saOdometer: saOdometer,
+      customerAddress: saCustomerAddress,
+      saCustomerAddress: saCustomerAddress,
+      customerComplaints: customerComplaints,
       wabComplaints: customerComplaints,
+      serviceType: serviceType,
       wabServiceType: serviceType,
+      damages: damages,
       wabDamages: damages,
+      functionalInspections: functionalInspectionsMobile,
       wabInspections: functionalInspectionsMobile,
     };
-    setWabHistory(prev => [wabEntry, ...prev]);
 
-    // Update ticket status in guest list
+    setWabHistory(prev => [updatedTicket, ...prev.filter(item => item.ticketId !== selectedTicket.ticketId)]);
+
     setTickets(prev => prev.map(item =>
       item.ticketId === selectedTicket.ticketId
-        ? { ...item, status: 'WabDone', wabSubmitted: true, wabCustomerName: saCustomerName }
+        ? updatedTicket
         : item
     ));
 
@@ -548,6 +576,8 @@ export default function App() {
       <ScrollView
         style={{ flex: 1, paddingHorizontal: 16, paddingTop: 16 }}
         contentContainerStyle={{ paddingBottom: 24 }}
+        automaticallyAdjustKeyboardInsets={true}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -589,8 +619,22 @@ export default function App() {
             setWabStep={setWabStep}
             saCustomerName={saCustomerName}
             setSaCustomerName={setSaCustomerName}
+            saDriverName={saDriverName}
+            setSaDriverName={setSaDriverName}
             saCustomerPhone={saCustomerPhone}
             setSaCustomerPhone={setSaCustomerPhone}
+            saCustomerEmail={saCustomerEmail}
+            setSaCustomerEmail={setSaCustomerEmail}
+            saIdentityNo={saIdentityNo}
+            setSaIdentityNo={setSaIdentityNo}
+            saPoliceRegNo={saPoliceRegNo}
+            setSaPoliceRegNo={setSaPoliceRegNo}
+            saVehicleModel={saVehicleModel}
+            setSaVehicleModel={setSaVehicleModel}
+            saOdometer={saOdometer}
+            setSaOdometer={setSaOdometer}
+            saCustomerAddress={saCustomerAddress}
+            setSaCustomerAddress={setSaCustomerAddress}
             customerComplaints={customerComplaints}
             setCustomerComplaints={setCustomerComplaints}
             serviceType={serviceType}

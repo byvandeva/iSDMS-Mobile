@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
   View, Text, Modal, Image, TouchableOpacity,
-  PanResponder, StatusBar, Dimensions, ScrollView
+  PanResponder, StatusBar, Dimensions, ScrollView, Platform
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../../../../config/theme';
 import Damage360Modal from './Damage360Modal';
@@ -36,6 +36,9 @@ export default function Inspection360Modal({
   onSaveDamageItem,
   onDeleteDamageItem,
 }) {
+  const insets = useSafeAreaInsets();
+  const safeTop = Math.max(insets?.top || 0, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 44);
+
   const [selectedEvidencePhoto, setSelectedEvidencePhoto] = useState(null);
   const dragStartXRef = useRef(0);
   const startFrameRef = useRef(1);
@@ -100,7 +103,7 @@ export default function Inspection360Modal({
       onRequestClose={handleClose}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#f8fafc', position: 'relative' }}>
+      <View style={{ flex: 1, backgroundColor: '#f8fafc', paddingTop: safeTop }}>
         
         {/* TOP HEADER */}
         <View style={{
@@ -423,7 +426,7 @@ export default function Inspection360Modal({
           </Modal>
         ) : null}
 
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

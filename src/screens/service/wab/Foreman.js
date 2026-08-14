@@ -114,7 +114,7 @@ function AssignTechnicianModal({ visible, ticket, onAssign, onClose }) {
             <TextInput style={globalStyles.input} placeholder="Misal: Stall 01" value={stallName} onChangeText={setStallName} />
 
             <TouchableOpacity style={[globalStyles.button, { backgroundColor: COLORS.accentBlue, marginTop: 18 }]} onPress={handleAssign}>
-              <Text style={globalStyles.buttonText}>⚙ Assign & Distribusikan</Text>
+              <Text style={globalStyles.buttonText}>Assign & Distribusikan</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[globalStyles.button, { backgroundColor: '#64748b', marginTop: 8 }]} onPress={onClose}>
               <Text style={globalStyles.buttonText}>Batal</Text>
@@ -436,57 +436,122 @@ function MetricCard({ label, value, color, icon }) {
 function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRec, onAddTracking, onDelegate, onFinishJob }) {
   const [recExpanded, setRecExpanded] = useState(false);
   const [trackExpanded, setTrackExpanded] = useState(false);
+  const [damageExpanded, setDamageExpanded] = useState(false);
   const isCompleted = job.status === 'Completed';
+
+  const damages = ticket.wabDamages || ticket.damages || [];
+  const inspections = ticket.wabInspections || ticket.functionalInspections || [];
+  const odometerVal = ticket.odometer || ticket.saOdometer;
+  const complaintsVal = ticket.wabComplaints || ticket.customerComplaints;
+  const serviceTypeVal = ticket.wabServiceType || ticket.serviceType || getPurposeString(ticket.arrivalPurpose);
 
   return (
     <View style={fs.jobCard}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+      {/* CARD HEADER */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <Text style={globalStyles.queueBadge}>{ticket.queueNumber || 'Non-Q'}</Text>
-        {isUndistributed
-          ? <View style={[fs.pill, { borderColor: '#bfdbfe' }]}><Text style={[fs.pillText, { color: '#1d4ed8' }]}>Belum Distribusi</Text></View>
-          : isCompleted
-            ? <View style={[fs.pill, { backgroundColor: '#f0fdf4', borderColor: '#86efac' }]}><Text style={[fs.pillText, { color: '#15803d' }]}>✓ Selesai</Text></View>
-            : <View style={[fs.pill, { borderColor: '#fcd34d' }]}><Text style={[fs.pillText, { color: '#92400e' }]}>Dikerjakan</Text></View>
-        }
+        {isUndistributed ? (
+          <View style={[fs.pill, { backgroundColor: '#eff6ff', borderColor: '#bfdbfe' }]}>
+            <Text style={[fs.pillText, { color: '#0054a6' }]}>Belum Distribusi</Text>
+          </View>
+        ) : isCompleted ? (
+          <View style={[fs.pill, { backgroundColor: '#f0fdf4', borderColor: '#86efac' }]}>
+            <Text style={[fs.pillText, { color: '#15803d' }]}>✓ Selesai</Text>
+          </View>
+        ) : (
+          <View style={[fs.pill, { backgroundColor: '#fffbe6', borderColor: '#fef08a' }]}>
+            <Text style={[fs.pillText, { color: '#b45309' }]}>Dikerjakan</Text>
+          </View>
+        )}
       </View>
 
+      {/* VEHICLE & CUSTOMER HEADLINE */}
       <Text style={globalStyles.plateText}>{ticket.licensePlate}</Text>
-      <Text style={globalStyles.customerText}>{ticket.wabCustomerName || ticket.customerName || '-'}</Text>
-      <Text style={globalStyles.subDetailText}>
-        {ticket.vehicleModel} · {ticket.wabServiceType || getPurposeString(ticket.arrivalPurpose)}
+      <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a', marginTop: 2 }}>
+        {ticket.wabCustomerName || ticket.customerName || '-'}
       </Text>
 
+      {/* VEHICLE SUB-DETAILS */}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
+        <Text style={{ fontSize: 11, color: '#475569', fontWeight: '500' }}>
+          {ticket.vehicleModel || ticket.groupCode || '-'}
+        </Text>
+        {odometerVal ? (
+          <Text style={{ fontSize: 11, color: '#475569', fontWeight: '500' }}>
+            &bull; {Number(odometerVal).toLocaleString('id-ID')} KM
+          </Text>
+        ) : null}
+        <Text style={{ fontSize: 11, color: '#0054a6', fontWeight: 'bold' }}>
+          &bull; {serviceTypeVal}
+        </Text>
+      </View>
+
+      {/* DELEGATION BADGE */}
       {ticket.delegatedFrom && (
         <View style={fs.delegateBadge}>
-          <Feather name="corner-down-right" size={11} color="#7c3aed" />
+          <Feather name="corner-down-right" size={11} color="#64748b" />
           <Text style={fs.delegateText}>Diterima dari: {ticket.delegatedFrom}</Text>
         </View>
       )}
 
-      {ticket.wabComplaints ? (
+      {/* KELUHAN UTAMA */}
+      {complaintsVal ? (
         <View style={fs.complaintBox}>
-          <Feather name="message-square" size={12} color="#0054a6" />
-          <Text style={fs.complaintText} numberOfLines={2}>{ticket.wabComplaints}</Text>
+          <Feather name="message-square" size={12} color="#0054a6" style={{ marginTop: 2 }} />
+          <Text style={fs.complaintText} numberOfLines={2}>{complaintsVal}</Text>
         </View>
       ) : null}
 
+      {/* CATATAN KERUSAKAN BODI 360° */}
+      {damages.length > 0 && (
+        <View style={{ marginTop: 6 }}>
+          <TouchableOpacity style={fs.expandRow} onPress={() => setDamageExpanded(v => !v)}>
+            <Feather name="alert-triangle" size={12} color="#b45309" />
+            <Text style={[fs.expandText, { color: '#b45309' }]}>
+              Bodi 360° ({damages.length} Catatan Kerusakan)
+            </Text>
+            <Feather name={damageExpanded ? 'chevron-up' : 'chevron-down'} size={12} color="#94a3b8" style={{ marginLeft: 'auto' }} />
+          </TouchableOpacity>
+
+          {damageExpanded && (
+            <View style={{ marginTop: 4, paddingLeft: 4 }}>
+              {damages.map((d, idx) => {
+                const dotColor = d.severity === 'High' ? '#be123c' : d.severity === 'Medium' ? '#d97706' : '#15803d';
+                return (
+                  <View key={d.id || idx} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', gap: 6 }}>
+                    <Text style={{ color: dotColor, fontWeight: 'bold', fontSize: 12 }}>●</Text>
+                    <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#0f172a', flex: 1 }}>
+                      Frame {d.frame || 1}: {d.damageType || d.type || 'Scratch'}
+                    </Text>
+                    <Text style={{ fontSize: 10, color: '#64748b' }}>{d.notes || '-'}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* TECHNICIAN ASSIGNED BADGE */}
       {!isUndistributed && job.assignedTechnician && (
         <View style={fs.techAssigned}>
-          <Feather name="tool" size={12} color="#15803d" />
+          <Feather name="tool" size={12} color="#059669" />
           <Text style={fs.techAssignedText}>
-            {job.assignedTechnician.stallName} · <Text style={{ fontWeight: 'bold' }}>{job.assignedTechnician.name}</Text>
+            {job.assignedTechnician.stallName} &bull; <Text style={{ fontWeight: 'bold' }}>{job.assignedTechnician.name}</Text>
             <Text style={{ color: '#64748b' }}> ({job.assignedTechnician.specialty})</Text>
           </Text>
         </View>
       )}
 
+      {/* REKOMENDASI LIST */}
       {!isUndistributed && job.recommendations.length > 0 && (
-        <>
+        <View style={{ marginTop: 4 }}>
           <TouchableOpacity style={fs.expandRow} onPress={() => setRecExpanded(v => !v)}>
             <Feather name="file-text" size={12} color="#0054a6" />
             <Text style={[fs.expandText, { color: '#0054a6' }]}>{job.recommendations.length} Rekomendasi</Text>
             <Feather name={recExpanded ? 'chevron-up' : 'chevron-down'} size={12} color="#94a3b8" style={{ marginLeft: 'auto' }} />
           </TouchableOpacity>
+
           {recExpanded && job.recommendations.map(rec => (
             <View key={rec.id} style={fs.recItem}>
               <View style={{ flex: 1 }}>
@@ -494,27 +559,29 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
                 <Text style={fs.recDate}>Sebelum: {formatDate(rec.beforeDate)}</Text>
               </View>
               {!isCompleted && (
-                <>
-                  <TouchableOpacity onPress={() => onEditRec(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ marginLeft: 10 }}>
-                    <Feather name="edit-2" size={15} color="#0054a6" />
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity onPress={() => onEditRec(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Feather name="edit-2" size={14} color="#0054a6" />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onDeleteRec(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ marginLeft: 10 }}>
-                    <Feather name="trash-2" size={15} color="#be123c" />
+                  <TouchableOpacity onPress={() => onDeleteRec(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Feather name="trash-2" size={14} color="#be123c" />
                   </TouchableOpacity>
-                </>
+                </View>
               )}
             </View>
           ))}
-        </>
+        </View>
       )}
 
+      {/* TRACKING PEKERJAAN */}
       {!isUndistributed && job.trackingEntries.length > 0 && (
-        <>
+        <View style={{ marginTop: 4 }}>
           <TouchableOpacity style={fs.expandRow} onPress={() => setTrackExpanded(v => !v)}>
             <Feather name="clock" size={12} color="#d97706" />
             <Text style={[fs.expandText, { color: '#d97706' }]}>{job.trackingEntries.length} Tracking Pekerjaan</Text>
             <Feather name={trackExpanded ? 'chevron-up' : 'chevron-down'} size={12} color="#94a3b8" style={{ marginLeft: 'auto' }} />
           </TouchableOpacity>
+
           {trackExpanded && job.trackingEntries.map(entry => (
             <View key={entry.id} style={fs.trackItem}>
               <Feather name="circle" size={8} color="#d97706" style={{ marginTop: 3 }} />
@@ -524,11 +591,12 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
               </View>
             </View>
           ))}
-        </>
+        </View>
       )}
 
+      {/* ACTION BUTTONS */}
       {isUndistributed ? (
-        <TouchableOpacity style={[globalStyles.actionBtn, { backgroundColor: COLORS.accentBlue, flexDirection: 'row', justifyContent: 'center', gap: 6 }]} onPress={onAssign}>
+        <TouchableOpacity style={[globalStyles.actionBtn, { backgroundColor: '#0054a6', flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 12 }]} onPress={onAssign}>
           <Feather name="user-plus" size={14} color="#fff" />
           <Text style={globalStyles.actionBtnText}>Assign Teknisi & Distribusikan</Text>
         </TouchableOpacity>
@@ -539,9 +607,7 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
               style={[fs.actionChip, { borderColor: '#0054a6' }]}
               onPress={() => onEditRec(null)}>
               <Feather name="file-text" size={13} color="#0054a6" />
-              <Text style={[fs.actionChipText, { color: '#0054a6' }]}>
-                {job.recommendations.length > 0 ? '+ Rekomendasi' : '+ Rekomendasi'}
-              </Text>
+              <Text style={[fs.actionChipText, { color: '#0054a6' }]}>+ Rekomendasi</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[fs.actionChip, { borderColor: '#d97706' }]}
@@ -550,12 +616,13 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
               <Text style={[fs.actionChipText, { color: '#d97706' }]}>+ Tracking</Text>
             </TouchableOpacity>
           </View>
+
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity style={[globalStyles.actionBtn, { flex: 1, backgroundColor: '#64748b', marginTop: 0, flexDirection: 'row', justifyContent: 'center', gap: 5 }]} onPress={onDelegate}>
               <Feather name="corner-up-right" size={13} color="#fff" />
               <Text style={globalStyles.actionBtnText}>Pindahkan</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[globalStyles.actionBtn, { flex: 1, backgroundColor: '#15803d', marginTop: 0, flexDirection: 'row', justifyContent: 'center', gap: 5 }]} onPress={onFinishJob}>
+            <TouchableOpacity style={[globalStyles.actionBtn, { flex: 1, backgroundColor: '#059669', marginTop: 0, flexDirection: 'row', justifyContent: 'center', gap: 5 }]} onPress={onFinishJob}>
               <Feather name="check-circle" size={13} color="#fff" />
               <Text style={globalStyles.actionBtnText}>Finish Job</Text>
             </TouchableOpacity>
@@ -563,7 +630,7 @@ function JobCard({ ticket, job, isUndistributed, onAssign, onEditRec, onDeleteRe
         </View>
       ) : (
         <View style={fs.completedRow}>
-          <Feather name="check-circle" size={16} color="#15803d" />
+          <Feather name="check-circle" size={16} color="#059669" />
           <Text style={fs.completedText}>Pekerjaan Selesai</Text>
         </View>
       )}
@@ -884,7 +951,7 @@ const ms = StyleSheet.create({
 const fs = StyleSheet.create({
   metricsRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
   metricCard: {
-    flex: 1, backgroundColor: '#f8fafc',
+    flex: 1, backgroundColor: '#ffffff',
     borderRadius: 10, padding: 10,
     borderWidth: 1, borderColor: '#e2e8f0',
     alignItems: 'center',
@@ -895,7 +962,7 @@ const fs = StyleSheet.create({
   tabBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 5, paddingVertical: 9, paddingHorizontal: 6,
-    borderRadius: 9, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#f8fafc',
+    borderRadius: 9, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#ffffff',
   },
   tabBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   tabBtnText: { fontSize: 11, fontWeight: '600', color: '#64748b' },
@@ -905,29 +972,29 @@ const fs = StyleSheet.create({
   },
   tabCountText: { fontSize: 10, fontWeight: 'bold', color: '#fff' },
   jobCard: {
-    backgroundColor: '#f8fafc', borderRadius: 12,
-    borderWidth: 1, borderColor: '#e2e8f0',
-    padding: 13, marginBottom: 12,
+    backgroundColor: '#ffffff', borderRadius: 12,
+    borderWidth: 1, borderColor: '#cbd5e1',
+    padding: 14, marginBottom: 12,
   },
   pill: {
-    borderWidth: 1, borderRadius: 6,
-    paddingHorizontal: 8, paddingVertical: 3,
+    borderWidth: 1, borderRadius: 20,
+    paddingHorizontal: 10, paddingVertical: 3,
   },
-  pillText: { fontSize: 11, fontWeight: 'bold' },
+  pillText: { fontSize: 10, fontWeight: 'bold' },
   delegateBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
-    marginTop: 6, backgroundColor: '#f5f3ff',
+    marginTop: 6, backgroundColor: '#f8fafc',
     borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4,
-    borderWidth: 1, borderColor: '#ddd6fe',
+    borderWidth: 1, borderColor: '#e2e8f0',
   },
-  delegateText: { fontSize: 11, color: '#7c3aed', fontWeight: '600' },
+  delegateText: { fontSize: 11, color: '#475569', fontWeight: '600' },
   complaintBox: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 6,
-    marginTop: 7, backgroundColor: '#eff6ff',
+    marginTop: 7, backgroundColor: '#f8fafc',
     borderRadius: 7, paddingHorizontal: 9, paddingVertical: 6,
-    borderWidth: 1, borderColor: '#bfdbfe',
+    borderWidth: 1, borderColor: '#e2e8f0',
   },
-  complaintText: { flex: 1, fontSize: 12, color: '#1e40af', lineHeight: 17 },
+  complaintText: { flex: 1, fontSize: 12, color: '#334155', lineHeight: 17 },
   techAssigned: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     marginTop: 7, backgroundColor: '#f0fdf4',
@@ -942,25 +1009,25 @@ const fs = StyleSheet.create({
   },
   expandText: { fontSize: 12, fontWeight: '600' },
   recItem: {
-    flexDirection: 'row', alignItems: 'flex-start',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingVertical: 8, paddingHorizontal: 10,
-    backgroundColor: '#fefce8', borderRadius: 7,
-    borderWidth: 1, borderColor: '#fde68a', marginTop: 4,
+    backgroundColor: '#fffbe6', borderRadius: 7,
+    borderWidth: 1, borderColor: '#fef08a', marginTop: 4,
   },
-  recDesc: { fontSize: 13, fontWeight: '600', color: '#78350f' },
-  recDate: { fontSize: 11, color: '#92400e', marginTop: 2 },
+  recDesc: { fontSize: 12, fontWeight: '600', color: '#92400e' },
+  recDate: { fontSize: 11, color: '#b45309', marginTop: 1 },
   trackItem: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 8,
-    paddingVertical: 5, paddingHorizontal: 6,
-    backgroundColor: '#fffbeb', borderRadius: 6,
+    paddingVertical: 6, paddingHorizontal: 8,
+    backgroundColor: '#f8fafc', borderRadius: 6, borderWidth: 1, borderColor: '#e2e8f0',
     marginTop: 4,
   },
-  trackLabel: { fontSize: 12, fontWeight: '600', color: '#78350f' },
-  trackTime: { fontSize: 11, color: '#92400e', marginTop: 1 },
+  trackLabel: { fontSize: 12, fontWeight: '600', color: '#0f172a' },
+  trackTime: { fontSize: 11, color: '#64748b', marginTop: 1 },
   actionChip: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
     paddingVertical: 8, borderRadius: 8,
-    borderWidth: 1.5, backgroundColor: '#fff',
+    borderWidth: 1, backgroundColor: '#ffffff',
   },
   actionChipText: { fontSize: 12, fontWeight: '600' },
   completedRow: {

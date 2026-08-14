@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, Image, Modal,
-  PanResponder, ActionSheetIOS, Platform, Alert, ScrollView, Keyboard
+  PanResponder, ActionSheetIOS, Platform, Alert, ScrollView, Keyboard, KeyboardAvoidingView
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { globalStyles, COLORS } from '../../../config/theme';
@@ -14,8 +14,22 @@ export default function WabFormScreen({
   setWabStep,
   saCustomerName,
   setSaCustomerName,
+  saDriverName,
+  setSaDriverName,
   saCustomerPhone,
   setSaCustomerPhone,
+  saCustomerEmail,
+  setSaCustomerEmail,
+  saIdentityNo,
+  setSaIdentityNo,
+  saPoliceRegNo,
+  setSaPoliceRegNo,
+  saVehicleModel,
+  setSaVehicleModel,
+  saOdometer,
+  setSaOdometer,
+  saCustomerAddress,
+  setSaCustomerAddress,
   customerComplaints,
   setCustomerComplaints,
   serviceType,
@@ -54,6 +68,7 @@ export default function WabFormScreen({
   onDeleteDamageItem,
 }) {
   const [show360Modal, setShow360Modal] = useState(false);
+  const [showServiceTypePicker, setShowServiceTypePicker] = useState(false);
   const [selectedEvidencePhoto, setSelectedEvidencePhoto] = useState(null);
   const dragStartXRef = useRef(0);
   const startFrameRef = useRef(1);
@@ -243,22 +258,33 @@ export default function WabFormScreen({
       {wabStep === 1 && (
         <View>
           <Text style={globalStyles.cardTitle}>Step 1: Data Pelanggan & Kendaraan</Text>
-          <Text style={globalStyles.label}>Nomor Polisi</Text>
-          <TextInput style={[globalStyles.input, { backgroundColor: '#e2e8f0' }]} value={selectedTicket.licensePlate} editable={false} />
-          <Text style={globalStyles.label}>Nama Pelanggan (Wajib)</Text>
+
+          <Text style={globalStyles.label}>Nama Pelanggan / Pemilik (Wajib)</Text>
           <TextInput
             style={globalStyles.input}
-            placeholder="Budi Santoso"
+            placeholder="Masukkan nama pemilik / STNK..."
             value={saCustomerName}
             onChangeText={setSaCustomerName}
             returnKeyType="done"
             onSubmitEditing={Keyboard.dismiss}
             blurOnSubmit={true}
           />
-          <Text style={globalStyles.label}>Nomor Handphone / WhatsApp</Text>
+
+          <Text style={globalStyles.label}>Nama Pengemudi / Pembawa Kendaraan</Text>
           <TextInput
             style={globalStyles.input}
-            placeholder="081234567890"
+            placeholder="Nama pengemudi (jika berbeda)..."
+            value={saDriverName}
+            onChangeText={setSaDriverName}
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <Text style={globalStyles.label}>Nomor Telepon / WhatsApp (Wajib)</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Contoh: 08118207657"
             value={saCustomerPhone}
             onChangeText={setSaCustomerPhone}
             keyboardType="phone-pad"
@@ -266,8 +292,81 @@ export default function WabFormScreen({
             onSubmitEditing={Keyboard.dismiss}
             blurOnSubmit={true}
           />
-          <TouchableOpacity style={globalStyles.button} onPress={() => setWabStep(2)}>
-            <Text style={globalStyles.buttonText}>Selanjutnya</Text>
+
+          <Text style={globalStyles.label}>Email Pelanggan</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Contoh: pelanggan@suzuki.co.id"
+            value={saCustomerEmail}
+            onChangeText={setSaCustomerEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <Text style={globalStyles.label}>No. KTP / Identitas</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Contoh: 3171234567890001"
+            value={saIdentityNo}
+            onChangeText={setSaIdentityNo}
+            keyboardType="numeric"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <Text style={globalStyles.label}>Nomor Polisi (Plat Nomor)</Text>
+          <TextInput
+            style={[globalStyles.input, { fontWeight: 'bold' }]}
+            placeholder="Contoh: B 1697 TYK"
+            value={saPoliceRegNo || selectedTicket.licensePlate}
+            onChangeText={setSaPoliceRegNo}
+            autoCapitalize="characters"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <Text style={globalStyles.label}>Model Kendaraan</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Contoh: SWIFT (CBU)"
+            value={saVehicleModel || selectedTicket.vehicleModel}
+            onChangeText={setSaVehicleModel}
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <Text style={globalStyles.label}>Odometer Saat Ini (KM)</Text>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="Contoh: 15000"
+            value={saOdometer}
+            onChangeText={setSaOdometer}
+            keyboardType="numeric"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <Text style={globalStyles.label}>Alamat Tempat Tinggal / Domisili</Text>
+          <TextInput
+            style={[globalStyles.input, { height: 70, textAlignVertical: 'top' }]}
+            placeholder="Alamat domisili pelanggan..."
+            multiline
+            value={saCustomerAddress}
+            onChangeText={setSaCustomerAddress}
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+
+          <TouchableOpacity style={[globalStyles.button, { marginTop: 16 }]} onPress={() => setWabStep(2)}>
+            <Text style={globalStyles.buttonText}>Selanjutnya &rarr;</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -275,8 +374,23 @@ export default function WabFormScreen({
       {/* STEP 2 */}
       {wabStep === 2 && (
         <View>
-          <Text style={globalStyles.cardTitle}>Step 2: Keluhan Utama Pelanggan</Text>
-          <Text style={globalStyles.label}>Keluhan / Permintaan Servis</Text>
+          <Text style={globalStyles.cardTitle}>Step 2: Jenis Paket Servis & Keluhan Customer</Text>
+
+          <Text style={globalStyles.label}>Pilih Jenis Paket Servis</Text>
+          <View style={{ marginBottom: 12 }}>
+            <TouchableOpacity
+              activeOpacity={0.75}
+              style={[globalStyles.input, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
+              onPress={() => setShowServiceTypePicker(true)}
+            >
+              <Text style={{ fontSize: 14, color: serviceType ? '#0f172a' : '#94a3b8', fontWeight: serviceType ? '600' : '400' }}>
+                {serviceType || '-- Pilih Jenis Paket Servis --'}
+              </Text>
+              <Feather name="chevron-down" size={18} color="#64748b" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={globalStyles.label}>Keluhan / Permintaan Servis Utama</Text>
           <TextInput
             style={[globalStyles.input, { height: 100, textAlignVertical: 'top' }]}
             placeholder="Contoh: Suara mesin agak kasar saat AC dinyalakan..."
@@ -287,12 +401,13 @@ export default function WabFormScreen({
             onSubmitEditing={Keyboard.dismiss}
             blurOnSubmit={true}
           />
+
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
             <TouchableOpacity style={[globalStyles.button, { flex: 1, backgroundColor: '#64748b' }]} onPress={() => setWabStep(1)}>
               <Text style={globalStyles.buttonText}>Kembali</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[globalStyles.button, { flex: 2 }]} onPress={() => setWabStep(3)}>
-              <Text style={globalStyles.buttonText}>Selanjutnya</Text>
+              <Text style={globalStyles.buttonText}>Selanjutnya &rarr;</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -301,30 +416,87 @@ export default function WabFormScreen({
       {/* STEP 3 */}
       {wabStep === 3 && (
         <View>
-          <Text style={globalStyles.cardTitle}>Step 3: Jenis Pekerjaan Servis</Text>
-          <Text style={globalStyles.label}>Tipe Paket Servis</Text>
-          <TextInput
-            style={globalStyles.input}
-            value={serviceType}
-            onChangeText={setServiceType}
-            returnKeyType="done"
-            onSubmitEditing={Keyboard.dismiss}
-            blurOnSubmit={true}
-          />
+          <Text style={globalStyles.cardTitle}>Step 3: Inspeksi Komponen & Fungsi</Text>
+          <Text style={[globalStyles.label, { marginTop: 4, marginBottom: 8 }]}>Pemeriksaan Komponen & Fungsi:</Text>
+          <View style={{ backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#cbd5e1', overflow: 'hidden' }}>
+            {functionalInspectionsMobile.map((item, idx) => (
+              <View
+                key={item.id}
+                style={{
+                  padding: 12,
+                  borderBottomWidth: idx === functionalInspectionsMobile.length - 1 ? 0 : 1,
+                  borderBottomColor: '#f1f5f9'
+                }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a', flex: 1 }}>
+                    {idx + 1}. {item.name}
+                  </Text>
+
+                  {/* DIRECT 1-TAP SEGMENTED BUTTONS FOR TABLET & PHONE */}
+                  <View style={{ flexDirection: 'row', gap: 6 }}>
+                    <TouchableOpacity
+                      onPress={() => onFunctionalChangeMobile(item.id, 'status', 'OK')}
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 6,
+                        backgroundColor: item.status === 'OK' ? '#15803d' : '#f1f5f9',
+                        borderWidth: 1,
+                        borderColor: item.status === 'OK' ? '#15803d' : '#cbd5e1',
+                      }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: 'bold', color: item.status === 'OK' ? '#ffffff' : '#475569' }}>
+                        ✓ Baik
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => onFunctionalChangeMobile(item.id, 'status', 'Defect')}
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 6,
+                        backgroundColor: item.status === 'Defect' ? '#be123c' : '#f1f5f9',
+                        borderWidth: 1,
+                        borderColor: item.status === 'Defect' ? '#be123c' : '#cbd5e1',
+                      }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: 'bold', color: item.status === 'Defect' ? '#ffffff' : '#475569' }}>
+                        ⚠ Perbaikan
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <TextInput
+                  style={{ height: 32, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 6, paddingHorizontal: 8, fontSize: 12, color: '#0f172a', backgroundColor: '#f8fafc' }}
+                  placeholder="Catatan (opsional)..."
+                  value={item.notes}
+                  onChangeText={(text) => onFunctionalChangeMobile(item.id, 'notes', text)}
+                  returnKeyType="done"
+                  onSubmitEditing={Keyboard.dismiss}
+                  blurOnSubmit={true}
+                />
+              </View>
+            ))}
+          </View>
+
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
             <TouchableOpacity style={[globalStyles.button, { flex: 1, backgroundColor: '#64748b' }]} onPress={() => setWabStep(2)}>
               <Text style={globalStyles.buttonText}>Kembali</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[globalStyles.button, { flex: 2 }]} onPress={() => setWabStep(4)}>
-              <Text style={globalStyles.buttonText}>Selanjutnya</Text>
+              <Text style={globalStyles.buttonText}>Selanjutnya &rarr;</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
+      {/* STEP 4 */}
       {wabStep === 4 && (
         <View>
-          <Text style={globalStyles.cardTitle}>Step 4: Inspeksi Bodi & Fungsi Komponen</Text>
+          <Text style={globalStyles.cardTitle}>Step 4: Inspeksi Bodi 360°</Text>
 
           {/* ── INSPEKSI 360° PREVIEW ── */}
           <View style={{ marginBottom: 14 }}>
@@ -458,7 +630,6 @@ export default function WabFormScreen({
                 <ScrollView nestedScrollEnabled style={{ maxHeight: 125 }}>
                   {damages.map(d => {
                     const dotColor = d.severity === 'High' ? '#be123c' : d.severity === 'Medium' ? '#d97706' : '#15803d';
-                    const isSelectedFrame = frameIndex === d.frame;
                     return (
                       <View
                         key={d.id}
@@ -562,78 +733,12 @@ export default function WabFormScreen({
             </View>
           </View>
 
-          {/* ── PEMERIKSAAN KOMPONEN & FUNGSI ── */}
-          <Text style={[globalStyles.label, { marginTop: 4, marginBottom: 8 }]}>Pemeriksaan Komponen & Fungsi:</Text>
-          <View style={{ backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#cbd5e1', overflow: 'hidden' }}>
-            {functionalInspectionsMobile.map((item, idx) => (
-              <View
-                key={item.id}
-                style={{
-                  padding: 12,
-                  borderBottomWidth: idx === functionalInspectionsMobile.length - 1 ? 0 : 1,
-                  borderBottomColor: '#f1f5f9'
-                }}
-              >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a', flex: 1 }}>
-                    {idx + 1}. {item.name}
-                  </Text>
-
-                  {/* DIRECT 1-TAP SEGMENTED BUTTONS FOR TABLET & PHONE */}
-                  <View style={{ flexDirection: 'row', gap: 6 }}>
-                    <TouchableOpacity
-                      onPress={() => onFunctionalChangeMobile(item.id, 'status', 'OK')}
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        borderRadius: 6,
-                        backgroundColor: item.status === 'OK' ? '#15803d' : '#f1f5f9',
-                        borderWidth: 1,
-                        borderColor: item.status === 'OK' ? '#15803d' : '#cbd5e1',
-                      }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: 'bold', color: item.status === 'OK' ? '#ffffff' : '#475569' }}>
-                        ✓ Baik
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => onFunctionalChangeMobile(item.id, 'status', 'Defect')}
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        borderRadius: 6,
-                        backgroundColor: item.status === 'Defect' ? '#be123c' : '#f1f5f9',
-                        borderWidth: 1,
-                        borderColor: item.status === 'Defect' ? '#be123c' : '#cbd5e1',
-                      }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: 'bold', color: item.status === 'Defect' ? '#ffffff' : '#475569' }}>
-                        ⚠ Perbaikan
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <TextInput
-                  style={{ height: 32, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 6, paddingHorizontal: 8, fontSize: 12, color: '#0f172a', backgroundColor: '#f8fafc' }}
-                  placeholder="Catatan (opsional)..."
-                  value={item.notes}
-                  onChangeText={(text) => onFunctionalChangeMobile(item.id, 'notes', text)}
-                  returnKeyType="done"
-                  onSubmitEditing={Keyboard.dismiss}
-                  blurOnSubmit={true}
-                />
-              </View>
-            ))}
-          </View>
-
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
             <TouchableOpacity style={[globalStyles.button, { flex: 1, backgroundColor: '#64748b' }]} onPress={() => setWabStep(3)}>
               <Text style={globalStyles.buttonText}>Kembali</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[globalStyles.button, { flex: 2 }]} onPress={() => setWabStep(5)}>
-              <Text style={globalStyles.buttonText}>Selanjutnya</Text>
+              <Text style={globalStyles.buttonText}>Selanjutnya &rarr;</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -654,18 +759,46 @@ export default function WabFormScreen({
               <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Nama Pelanggan:</Text>
               <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saCustomerName || '-'}</Text>
             </View>
+            {saDriverName ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
+                <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Nama Pengemudi:</Text>
+                <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saDriverName}</Text>
+              </View>
+            ) : null}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
-              <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>No. Telepon:</Text>
+              <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>No. Telepon / WA:</Text>
               <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saCustomerPhone || '-'}</Text>
             </View>
+            {saCustomerEmail ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
+                <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Email:</Text>
+                <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saCustomerEmail}</Text>
+              </View>
+            ) : null}
+            {saIdentityNo ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
+                <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>No. KTP:</Text>
+                <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saIdentityNo}</Text>
+              </View>
+            ) : null}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
               <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Nomor Polisi:</Text>
-              <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: 'bold' }}>{selectedTicket?.licensePlate || '-'}</Text>
+              <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: 'bold' }}>{saPoliceRegNo || selectedTicket?.licensePlate || '-'}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
               <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Model Kendaraan:</Text>
-              <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{selectedTicket?.vehicleModel || '-'}</Text>
+              <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saVehicleModel || selectedTicket?.vehicleModel || '-'}</Text>
             </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
+              <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Odometer:</Text>
+              <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saOdometer ? `${Number(saOdometer).toLocaleString('id-ID')} KM` : '-'}</Text>
+            </View>
+            {saCustomerAddress ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingBottom: 6, marginBottom: 6 }}>
+                <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Alamat:</Text>
+                <Text style={{ fontSize: 12, color: '#0f172a', fontWeight: '600' }}>{saCustomerAddress}</Text>
+              </View>
+            ) : null}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 2 }}>
               <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold' }}>Jenis Servis:</Text>
               <Text style={{ fontSize: 12, color: '#0054a6', fontWeight: 'bold' }}>{serviceType}</Text>
@@ -863,6 +996,59 @@ export default function WabFormScreen({
           </View>
         </Modal>
       ) : null}
+
+      {/* SERVICE TYPE DROPDOWN PICKER MODAL */}
+      <Modal
+        visible={showServiceTypePicker}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowServiceTypePicker(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{ flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.75)', justifyContent: 'center', alignItems: 'center', padding: 20 }}
+          onPress={() => setShowServiceTypePicker(false)}
+        >
+          <TouchableOpacity activeOpacity={1} style={{ width: '100%', maxWidth: 360, backgroundColor: '#ffffff', borderRadius: 14, padding: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0f172a', marginBottom: 12 }}>Pilih Jenis Paket Servis</Text>
+            {[
+              'Paket Servis Periodic (Berkala)',
+              'Paket 10.000 KM',
+              'Paket 20.000 KM',
+              'Paket 40.000 KM',
+              'Light Repair (Perbaikan Ringan)',
+              'General Repair (Perbaikan Umum)',
+              'Body & Paint (Perbaikan Bodi)',
+              'Safety Check & Inspection',
+            ].map(type => (
+              <TouchableOpacity
+                key={type}
+                style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
+                  backgroundColor: serviceType === type ? '#eff6ff' : '#f8fafc',
+                  borderWidth: 1,
+                  borderColor: serviceType === type ? '#0054a6' : '#e2e8f0',
+                  marginBottom: 6,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+                onPress={() => {
+                  setServiceType(type);
+                  setShowServiceTypePicker(false);
+                }}
+              >
+                <Text style={{ fontSize: 13, fontWeight: serviceType === type ? 'bold' : '500', color: serviceType === type ? '#0054a6' : '#334155' }}>
+                  {type}
+                </Text>
+                {serviceType === type && <Feather name="check" size={16} color="#0054a6" />}
+              </TouchableOpacity>
+            ))}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
     </View>
   );

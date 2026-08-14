@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TextInput, TouchableOpacity, Image, Alert, Keyboard, useWindowDimensions, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Modal, TextInput, TouchableOpacity, Image, Alert, Keyboard, useWindowDimensions, ScrollView, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Feather } from '@expo/vector-icons';
@@ -21,6 +21,9 @@ export default function Damage360Modal({
 }) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+
+  const safeTop = Math.max(insets?.top || 0, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 44);
+  const safeBottom = Math.max(insets?.bottom || 0, 16);
 
   const handleSelectPhotoOptions = () => {
     Alert.alert(
@@ -78,10 +81,10 @@ export default function Damage360Modal({
       visible={visible}
       transparent
       animationType="fade"
-      statusBarTranslucent={true}
+      statusBarTranslucent={false}
       onRequestClose={onClose}
     >
-      <View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+      <View style={{ flex: 1, paddingTop: safeTop, paddingBottom: safeBottom }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={{ flex: 1 }}
@@ -115,9 +118,14 @@ export default function Damage360Modal({
               }}
             >
               <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 4 }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0f172a', marginBottom: 12 }}>
-                  {isEditing ? 'Edit Catatan Kerusakan 360°' : 'Tambah Catatan Kerusakan 360°'}
-                </Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0f172a' }}>
+                    {isEditing ? 'Edit Catatan Kerusakan 360°' : 'Tambah Catatan Kerusakan 360°'}
+                  </Text>
+                  <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <Feather name="x" size={20} color="#64748b" />
+                  </TouchableOpacity>
+                </View>
 
                 <Text style={globalStyles.label}>Jenis Kerusakan:</Text>
                 <View style={globalStyles.purposeGrid}>
